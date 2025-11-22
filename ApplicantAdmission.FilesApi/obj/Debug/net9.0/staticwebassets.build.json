@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "41OpX143406N4ZUc03t7nWZYmt4f7Rp1yDlHyqSNkFM=",
+  "Source": "ApplicantAdmission.FilesApi",
+  "BasePath": "_content/ApplicantAdmission.FilesApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

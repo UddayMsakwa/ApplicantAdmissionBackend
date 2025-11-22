@@ -1,0 +1,53 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "ApplicantAdmission.BusinessLogic/1.0.0": {
+        "dependencies": {
+          "ApplicantAdmission.DataAccess": "1.0.0",
+          "ApplicantAdmission.Infrastructure": "1.0.0"
+        },
+        "runtime": {
+          "ApplicantAdmission.BusinessLogic.dll": {}
+        }
+      },
+      "ApplicantAdmission.DataAccess/1.0.0": {
+        "runtime": {
+          "ApplicantAdmission.DataAccess.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "ApplicantAdmission.Infrastructure/1.0.0": {
+        "runtime": {
+          "ApplicantAdmission.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ApplicantAdmission.BusinessLogic/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ApplicantAdmission.DataAccess/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ApplicantAdmission.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

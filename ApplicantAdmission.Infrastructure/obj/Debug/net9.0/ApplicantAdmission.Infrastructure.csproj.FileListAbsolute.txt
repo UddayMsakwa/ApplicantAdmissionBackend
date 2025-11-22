@@ -1,0 +1,12 @@
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\bin\Debug\net9.0\ApplicantAdmission.Infrastructure.deps.json
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\bin\Debug\net9.0\ApplicantAdmission.Infrastructure.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\bin\Debug\net9.0\ApplicantAdmission.Infrastructure.pdb
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.AssemblyInfo.cs
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.sourcelink.json
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\refint\ApplicantAdmission.Infrastructure.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ApplicantAdmission.Infrastructure.pdb
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.Infrastructure\obj\Debug\net9.0\ref\ApplicantAdmission.Infrastructure.dll
