@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "lqV7uBRZ2mQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\udday\\ApplicantAdmission\\ApplicantAdmission.WebApi\\ApplicantAdmission.WebApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\udday\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.11\\microsoft.aspnetcore.openapi.9.0.11.nupkg.sha512",
+    "C:\\Users\\udday\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
