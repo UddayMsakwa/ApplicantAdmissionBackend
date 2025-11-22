@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "6wCCP51QdI38Ra0ogtTujR5r65iJGqvBIVRrtgLTsBk=",
+  "Source": "ApplicantAdmission.WebApi",
+  "BasePath": "_content/ApplicantAdmission.WebApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
