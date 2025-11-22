@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ApplicantAdmission.BusinessLogic")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ad52ec080f57543fb656afc2aea197a20eda48c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b66465bdf21137e355088dfaf8f0ce3c7374b8b3")]
 [assembly: System.Reflection.AssemblyProductAttribute("ApplicantAdmission.BusinessLogic")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ApplicantAdmission.BusinessLogic")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

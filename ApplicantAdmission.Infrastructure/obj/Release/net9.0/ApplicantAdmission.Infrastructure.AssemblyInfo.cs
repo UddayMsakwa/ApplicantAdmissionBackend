@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ApplicantAdmission.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ad52ec080f57543fb656afc2aea197a20eda48c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+416fbb6ec42d68edd32cfda38e45fe572537c7c7")]
 [assembly: System.Reflection.AssemblyProductAttribute("ApplicantAdmission.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ApplicantAdmission.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,18 +1,21 @@
-using ApplicantAdmission.DataAccess;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using NLog.Web;
+using ApplicantAdmission.DataAccess;
+using NLog.Extensions.Logging;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
+
 
 builder.Logging.ClearProviders();
-builder.Host.UseNLog();
+builder.Logging.AddNLog();
+
 
 builder.Services.AddDbContext<ApplicantDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddQuartz();
-builder.Services.AddQuartzHostedService();
+builder.Services.AddHostedService<Worker>();
 
 var app = builder.Build();
 app.Run();

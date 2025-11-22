@@ -11,34 +11,29 @@ public class ApplicantDbContext : DbContext
     }
 
     
-    public DbSet<Applicant> Applicants { get; set; } = null!;
-    public DbSet<Manager> Managers { get; set; } = null!;
-
-  
-    public DbSet<EducationLevel> EducationLevels { get; set; } = null!;
-    public DbSet<EducationDocumentType> EducationDocumentTypes { get; set; } = null!;
-    public DbSet<Faculty> Faculties { get; set; } = null!;
-    public DbSet<Program> Programs { get; set; } = null!;
-    public DbSet<AdmissionProgram> AdmissionPrograms { get; set; } = null!;
-    public DbSet<ApplicantAdmission> ApplicantAdmissions { get; set; } = null!;
+    public DbSet<Document> Documents => Set<Document>();
+    public DbSet<EducationDocument> EducationDocuments => Set<EducationDocument>();
 
     
-    public DbSet<FileEntity> Files { get; set; } = null!;
-    public DbSet<Document> Documents { get; set; } = null!;
-    public DbSet<PassportDocument> PassportDocuments { get; set; } = null!;
-    public DbSet<EducationDocument> EducationDocuments { get; set; } = null!;
+    public DbSet<Applicant> Applicants => Set<Applicant>();
+    public DbSet<Manager> Managers => Set<Manager>();
+    public DbSet<EducationLevel> EducationLevels => Set<EducationLevel>();
+    public DbSet<EducationDocumentType> EducationDocumentTypes => Set<EducationDocumentType>();
+    public DbSet<Faculty> Faculties => Set<Faculty>();
+    public DbSet<Program> Programs => Set<Program>();
+    public DbSet<AdmissionProgram> AdmissionPrograms => Set<AdmissionProgram>();
+
+    public DbSet<ApplicantAdmission.DataAccess.Entities.ApplicantAdmission> ApplicantAdmissions
+        => Set<ApplicantAdmission.DataAccess.Entities.ApplicantAdmission>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Document>().UseTptMappingStrategy();
+
   
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicantDbContext).Assembly);
-
-        
-        modelBuilder.Entity<Document>()
-            .HasDiscriminator<string>("DocumentKind")
-            .HasValue<PassportDocument>("Passport")
-            .HasValue<EducationDocument>("Education");
-
-        base.OnModelCreating(modelBuilder);
     }
 }

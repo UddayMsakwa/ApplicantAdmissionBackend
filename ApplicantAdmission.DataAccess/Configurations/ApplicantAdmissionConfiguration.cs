@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ApplicantAdmission.DataAccess.Configurations;
 
-public class ApplicantAdmissionConfiguration : IEntityTypeConfiguration<ApplicantAdmission>
+public class ApplicantAdmissionConfiguration
+    : IEntityTypeConfiguration<ApplicantAdmission.DataAccess.Entities.ApplicantAdmission>
 {
-    public void Configure(EntityTypeBuilder<ApplicantAdmission> builder)
+    public void Configure(EntityTypeBuilder<ApplicantAdmission.DataAccess.Entities.ApplicantAdmission> builder)
     {
         builder.HasKey(x => x.Id);
 
