@@ -20,7 +20,7 @@ public class ApplicantDbContext : DbContext
     public DbSet<EducationLevel> EducationLevels => Set<EducationLevel>();
     public DbSet<EducationDocumentType> EducationDocumentTypes => Set<EducationDocumentType>();
     public DbSet<Faculty> Faculties => Set<Faculty>();
-    public DbSet<Program> Programs => Set<Program>();
+    public DbSet<ProgramEntity> Programs => Set<ProgramEntity>();
     public DbSet<AdmissionProgram> AdmissionPrograms => Set<AdmissionProgram>();
 
     public DbSet<ApplicantAdmission.DataAccess.Entities.ApplicantAdmission> ApplicantAdmissions
