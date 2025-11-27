@@ -1,5 +1,5 @@
 ﻿using ApplicantAdmission.BusinessLogic.Interfaces;
-using ApplicantAdmission.BusinessLogic.Models.Program;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Program;
 using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.DataAccess.Entities;
 using AutoMapper;

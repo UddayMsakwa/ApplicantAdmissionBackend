@@ -1,10 +1,7 @@
-﻿using ApplicantAdmission.BusinessLogic.Interfaces;
-using ApplicantAdmission.BusinessLogic.Models.Applicant;
+﻿using AutoMapper;
 using ApplicantAdmission.DataAccess;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-
-namespace ApplicantAdmission.BusinessLogic.Services;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
 
 public class ApplicantService : IApplicantService
 {
@@ -19,9 +16,7 @@ public class ApplicantService : IApplicantService
 
     public async Task<ApplicantDto?> GetByIdAsync(Guid id)
     {
-        var entity = await _context.Applicants
-            .FirstOrDefaultAsync(x => x.Id == id);
-
+        var entity = await _context.Applicants.FirstOrDefaultAsync(x => x.Id == id);
         return entity == null ? null : _mapper.Map<ApplicantDto>(entity);
     }
 
@@ -33,9 +28,8 @@ public class ApplicantService : IApplicantService
 
     public async Task<ApplicantDto> CreateAsync(ApplicantCreateDto dto)
     {
-        var entity = _mapper.Map<DataAccess.Entities.Applicant>(dto);
-
-        entity.Id = Guid.NewGuid();
+        var entity = _mapper.Map<Applicant>(dto);
+        entity.PasswordHash = dto.Password; 
 
         _context.Applicants.Add(entity);
         await _context.SaveChangesAsync();

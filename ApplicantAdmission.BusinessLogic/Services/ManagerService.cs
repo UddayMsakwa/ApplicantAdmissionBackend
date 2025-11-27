@@ -1,5 +1,5 @@
 ﻿using ApplicantAdmission.BusinessLogic.Interfaces;
-using ApplicantAdmission.BusinessLogic.Models.Manager;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 using ApplicantAdmission.DataAccess;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;

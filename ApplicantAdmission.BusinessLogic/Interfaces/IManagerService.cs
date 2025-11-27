@@ -1,4 +1,4 @@
-﻿using ApplicantAdmission.BusinessLogic.Models.Manager;
+﻿using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 
 namespace ApplicantAdmission.BusinessLogic.Interfaces;
 

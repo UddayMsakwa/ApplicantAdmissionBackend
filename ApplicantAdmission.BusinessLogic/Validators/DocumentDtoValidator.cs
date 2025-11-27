@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using ApplicantAdmission.BusinessLogic.Models;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Document;
 
 public class DocumentDtoValidator : AbstractValidator<DocumentDto>
 {

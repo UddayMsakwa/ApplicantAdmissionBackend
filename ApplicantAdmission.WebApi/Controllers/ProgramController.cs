@@ -1,7 +1,5 @@
-﻿using ApplicantAdmission.BusinessLogic.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ApplicantAdmission.WebApi.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using ApplicantAdmission.BusinessLogic.Interfaces;
 
 [ApiController]
 [Route("api/programs")]
@@ -18,12 +16,5 @@ public class ProgramController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id)
-    {
-        var program = await _service.GetByIdAsync(id);
-        return program == null ? NotFound() : Ok(program);
     }
 }

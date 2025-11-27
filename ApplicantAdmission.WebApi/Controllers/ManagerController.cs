@@ -1,7 +1,5 @@
-﻿using ApplicantAdmission.BusinessLogic.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ApplicantAdmission.WebApi.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using ApplicantAdmission.BusinessLogic.Interfaces;
 
 [ApiController]
 [Route("api/managers")]
@@ -12,13 +10,6 @@ public class ManagerController : ControllerBase
     public ManagerController(IManagerService service)
     {
         _service = service;
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id)
-    {
-        var manager = await _service.GetByIdAsync(id);
-        return manager == null ? NotFound() : Ok(manager);
     }
 
     [HttpGet]

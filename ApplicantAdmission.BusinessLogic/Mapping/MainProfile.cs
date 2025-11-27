@@ -1,38 +1,29 @@
-﻿using ApplicantAdmission.BusinessLogic.Models.Applicant;
-using ApplicantAdmission.BusinessLogic.Models.Manager;
-using ApplicantAdmission.BusinessLogic.Models.Program;
-using ApplicantAdmission.BusinessLogic.Models.Faculty;
-using ApplicantAdmission.BusinessLogic.Models.Admission;
-using ApplicantAdmission.BusinessLogic.Models.Document;
+﻿using AutoMapper;
 using ApplicantAdmission.DataAccess.Entities;
-using AutoMapper;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Document;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Education;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Program;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Faculty;
 
-namespace ApplicantAdmission.BusinessLogic.Mapping
+public class MainProfile : Profile
 {
-    public class MainProfile : Profile
+    public MainProfile()
     {
-        public MainProfile()
-        {
-            
-            CreateMap<Applicant, ApplicantDto>();
-            CreateMap<ApplicantCreateDto, Applicant>();
+        CreateMap<Applicant, ApplicantDto>();
+        CreateMap<ApplicantCreateDto, Applicant>();
 
-           
-            CreateMap<Manager, ManagerDto>();
+        CreateMap<ApplicantAdmission, ApplicantAdmissionDto>();
 
-            
-            CreateMap<Faculty, FacultyDto>();
+        CreateMap<Document, DocumentDto>();
+        CreateMap<EducationDocument, EducationDocumentDto>();
 
-            
-            CreateMap<ProgramEntity, ProgramDto>();
-            CreateMap<ProgramDto, ProgramEntity>();
+        CreateMap<Manager, ManagerDto>();
 
-           
-            CreateMap<ApplicantAdmission, ApplicantAdmissionDto>();
+        CreateMap<ProgramEntity, ProgramDto>();
 
-           
-            CreateMap<Document, DocumentDto>();
-            CreateMap<EducationDocument, EducationDocumentDto>();
-        }
+        CreateMap<Faculty, FacultyDto>();
     }
 }
