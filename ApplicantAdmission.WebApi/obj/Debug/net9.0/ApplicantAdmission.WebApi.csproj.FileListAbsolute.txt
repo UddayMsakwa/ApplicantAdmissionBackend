@@ -8,6 +8,10 @@ C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\App
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\ApplicantAdmission.WebApi.pdb
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\AutoMapper.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\FluentValidation.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\FluentValidation.AspNetCore.dll
+C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\FluentValidation.DependencyInjectionExtensions.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Humanizer.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.Build.Locator.dll
@@ -31,10 +35,6 @@ C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Mic
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
-C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Microsoft.OpenApi.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\Users\udday\ApplicantAdmission\ApplicantAdmission.WebApi\bin\Debug\net9.0\NLog.dll

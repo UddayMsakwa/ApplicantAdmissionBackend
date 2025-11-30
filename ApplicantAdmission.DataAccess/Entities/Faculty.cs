@@ -6,5 +6,6 @@ public class Faculty
 
     public string Name { get; set; } = null!;
 
-    public ICollection<Program> Programs { get; set; } = new List<Program>();
+    public ICollection<ProgramEntity> Programs { get; set; } = new List<ProgramEntity>();
+
 }

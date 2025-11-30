@@ -15,8 +15,9 @@ public class ManagerConfiguration : IEntityTypeConfiguration<Manager>
         builder.Property(x => x.FullName).IsRequired();
         builder.Property(x => x.Role).IsRequired();
 
-        builder.HasMany(x => x.Admissions)
+        builder.HasMany(x => x.ApplicantAdmissions)
             .WithOne(x => x.Manager)
-            .HasForeignKey(x => x.ManagerId);
+            .HasForeignKey(x => x.ManagerId)
+            .IsRequired(false);
     }
 }

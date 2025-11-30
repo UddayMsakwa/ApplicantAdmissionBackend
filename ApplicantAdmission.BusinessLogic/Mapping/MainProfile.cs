@@ -8,22 +8,35 @@ using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Program;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Faculty;
 
-public class MainProfile : Profile
+namespace ApplicantAdmission.BusinessLogic.Mapping
 {
-    public MainProfile()
+    public class MainProfile : Profile
     {
-        CreateMap<Applicant, ApplicantDto>();
-        CreateMap<ApplicantCreateDto, Applicant>();
+        public MainProfile()
+        {
+            
+            CreateMap<Applicant, ApplicantDto>();
+            CreateMap<ApplicantCreateDto, Applicant>();
 
-        CreateMap<ApplicantAdmission, ApplicantAdmissionDto>();
+            
+            CreateMap<ApplicantAdmissionEntity, ApplicantAdmissionDto>()
+                .ForMember(dest => dest.Program,
+                           opt => opt.MapFrom(src => src.AdmissionProgram.Program));
 
-        CreateMap<Document, DocumentDto>();
-        CreateMap<EducationDocument, EducationDocumentDto>();
+            CreateMap<ApplicantAdmissionCreateDto, ApplicantAdmissionEntity>();
 
-        CreateMap<Manager, ManagerDto>();
+            
+            CreateMap<Document, DocumentDto>();
+            CreateMap<EducationDocument, EducationDocumentDto>();
 
-        CreateMap<ProgramEntity, ProgramDto>();
+            
+            CreateMap<Manager, ManagerDto>();
 
-        CreateMap<Faculty, FacultyDto>();
+            
+            CreateMap<ProgramEntity, ProgramDto>();
+
+            
+            CreateMap<Faculty, FacultyDto>();
+        }
     }
 }

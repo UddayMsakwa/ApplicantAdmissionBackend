@@ -1,7 +1,11 @@
-﻿using AutoMapper;
-using ApplicantAdmission.DataAccess;
-using Microsoft.EntityFrameworkCore;
+﻿using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
+using ApplicantAdmission.DataAccess;
+using ApplicantAdmission.DataAccess.Entities;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+
+namespace ApplicantAdmission.BusinessLogic.Services;
 
 public class ApplicantService : IApplicantService
 {
@@ -29,7 +33,8 @@ public class ApplicantService : IApplicantService
     public async Task<ApplicantDto> CreateAsync(ApplicantCreateDto dto)
     {
         var entity = _mapper.Map<Applicant>(dto);
-        entity.PasswordHash = dto.Password; 
+        entity.Id = Guid.NewGuid();
+        entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         _context.Applicants.Add(entity);
         await _context.SaveChangesAsync();

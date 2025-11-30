@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ApplicantAdmission.DataAccess.Configurations;
 
-public class ProgramConfiguration : IEntityTypeConfiguration<Program>
+public class ProgramConfiguration : IEntityTypeConfiguration<ProgramEntity>
 {
-    public void Configure(EntityTypeBuilder<Program> builder)
+    public void Configure(EntityTypeBuilder<ProgramEntity> builder)
     {
         builder.HasKey(x => x.Id);
 

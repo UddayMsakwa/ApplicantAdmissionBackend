@@ -13,6 +13,9 @@ public class Applicant
     public string Gender { get; set; } = null!;
     public string Citizenship { get; set; } = null!;
 
-    public ICollection<ApplicantAdmission> Admissions { get; set; } = new List<ApplicantAdmission>();
-    public ICollection<Document> Documents { get; set; } = new List<Document>();
+    public ICollection<ApplicantAdmissionEntity> Admissions { get; set; }
+        = new List<ApplicantAdmissionEntity>();
+
+    public ICollection<Document> Documents { get; set; }
+        = new List<Document>();
 }

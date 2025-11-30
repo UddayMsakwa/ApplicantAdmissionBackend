@@ -6,5 +6,6 @@ public class EducationLevel
     public string Name { get; set; } = null!;
 
     public ICollection<EducationDocumentType> DocumentTypes { get; set; } = new List<EducationDocumentType>();
-    public ICollection<Program> Programs { get; set; } = new List<Program>();
+    public ICollection<ProgramEntity> Programs { get; set; } = new List<ProgramEntity>();
+
 }

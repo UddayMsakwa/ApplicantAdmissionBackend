@@ -36,6 +36,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasIndex("ProgramId");
 
                     b.ToTable("AdmissionPrograms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            ProgramId = new Guid("33333333-3333-3333-3333-333333333333")
+                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Applicant", b =>
@@ -49,7 +56,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -76,7 +83,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.ToTable("Applicants");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmission", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,8 +103,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -175,6 +181,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EducationLevels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Bachelor"
+                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Faculty", b =>
@@ -190,6 +203,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Faculties");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Name = "Engineering"
+                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.FileEntity", b =>
@@ -243,9 +263,19 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Managers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Email = "manager@test.com",
+                            FullName = "Admin Manager",
+                            PasswordHash = "hashed_pass",
+                            Role = "Admin"
+                        });
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Program", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -268,6 +298,15 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasIndex("LevelId");
 
                     b.ToTable("Programs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            FacultyId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Computer Science"
+                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocument", b =>
@@ -309,7 +348,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.AdmissionProgram", b =>
                 {
-                    b.HasOne("ApplicantAdmission.DataAccess.Entities.Program", "Program")
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.ProgramEntity", "Program")
                         .WithMany("AdmissionPrograms")
                         .HasForeignKey("ProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,7 +357,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Navigation("Program");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmission", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
                 {
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.AdmissionProgram", "AdmissionProgram")
                         .WithMany("ApplicantAdmissions")
@@ -333,9 +372,8 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.Manager", "Manager")
-                        .WithMany("Admissions")
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany("ApplicantAdmissions")
+                        .HasForeignKey("ManagerId");
 
                     b.Navigation("AdmissionProgram");
 
@@ -381,7 +419,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Navigation("NextLevel");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Program", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>
                 {
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.Faculty", "Faculty")
                         .WithMany("Programs")
@@ -457,10 +495,10 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Manager", b =>
                 {
-                    b.Navigation("Admissions");
+                    b.Navigation("ApplicantAdmissions");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Program", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>
                 {
                     b.Navigation("AdmissionPrograms");
                 });

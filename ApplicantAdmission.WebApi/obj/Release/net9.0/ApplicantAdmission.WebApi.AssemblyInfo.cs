@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ApplicantAdmission.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b66465bdf21137e355088dfaf8f0ce3c7374b8b3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f4a1e60992b01fede81a7e5637db77c7608d1d87")]
 [assembly: System.Reflection.AssemblyProductAttribute("ApplicantAdmission.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ApplicantAdmission.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
