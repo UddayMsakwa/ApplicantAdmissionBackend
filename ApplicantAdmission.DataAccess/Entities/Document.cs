@@ -1,7 +1,8 @@
 ﻿using System;
+
 namespace ApplicantAdmission.DataAccess.Entities;
 
-public abstract class Document
+public class Document
 {
     public Guid Id { get; set; }
 
@@ -11,5 +12,5 @@ public abstract class Document
     public Guid FileId { get; set; }
     public FileEntity File { get; set; } = null!;
 
-    public string DocumentKind { get; set; } = null!; // "Passport", "Education"
+    public string DocumentKind { get; set; } = null!;
 }

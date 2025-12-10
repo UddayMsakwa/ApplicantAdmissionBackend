@@ -8,6 +8,7 @@ using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Program;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Faculty;
 
+
 namespace ApplicantAdmission.BusinessLogic.Mapping
 {
     public class MainProfile : Profile
@@ -28,8 +29,10 @@ namespace ApplicantAdmission.BusinessLogic.Mapping
             
             CreateMap<Document, DocumentDto>();
             CreateMap<EducationDocument, EducationDocumentDto>();
-
             
+            CreateMap<DocumentCreateDto, Document>();
+
+
             CreateMap<Manager, ManagerDto>();
 
             

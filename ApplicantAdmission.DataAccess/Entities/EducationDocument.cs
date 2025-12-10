@@ -1,4 +1,6 @@
-﻿namespace ApplicantAdmission.DataAccess.Entities;
+﻿using System;
+
+namespace ApplicantAdmission.DataAccess.Entities;
 
 public class EducationDocument : Document
 {
