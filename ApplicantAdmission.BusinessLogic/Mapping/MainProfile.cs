@@ -31,6 +31,9 @@ namespace ApplicantAdmission.BusinessLogic.Mapping
             CreateMap<EducationDocument, EducationDocumentDto>();
             
             CreateMap<DocumentCreateDto, Document>();
+            
+            CreateMap<EducationDocumentCreateDto, EducationDocument>();
+            
 
 
             CreateMap<Manager, ManagerDto>();

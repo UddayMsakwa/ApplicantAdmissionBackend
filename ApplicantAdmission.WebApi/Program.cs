@@ -18,6 +18,7 @@ builder.Services.AddDbContext<ApplicantDbContext>(options =>
 builder.Services.AddAutoMapper(typeof(MainProfile).Assembly);
 
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IEducationDocumentService, EducationDocumentService>();
 
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();

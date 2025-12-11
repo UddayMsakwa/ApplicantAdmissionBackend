@@ -8,12 +8,18 @@ public class EducationDocumentConfiguration : IEntityTypeConfiguration<Education
 {
     public void Configure(EntityTypeBuilder<EducationDocument> builder)
     {
+        
         builder.Property(x => x.InstitutionName).IsRequired();
         builder.Property(x => x.GraduationYear).IsRequired();
 
-        builder.HasOne(x => x.DocumentType)
+        builder.Property(x => x.AverageScore)
+            .HasColumnType("numeric(5,2)") 
+            .IsRequired();
+
+        builder.HasOne<EducationDocumentType>()
             .WithMany()
-            .HasForeignKey(x => x.DocumentTypeId);
+            .HasForeignKey(x => x.DocumentTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("EducationDocuments");
     }

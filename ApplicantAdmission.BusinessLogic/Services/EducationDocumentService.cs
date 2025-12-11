@@ -1,7 +1,11 @@
-﻿using AutoMapper;
-using ApplicantAdmission.DataAccess;
-using Microsoft.EntityFrameworkCore;
+﻿using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Education;
+using ApplicantAdmission.DataAccess;
+using ApplicantAdmission.DataAccess.Entities;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+
+namespace ApplicantAdmission.BusinessLogic.Services;
 
 public class EducationDocumentService : IEducationDocumentService
 {
@@ -14,12 +18,26 @@ public class EducationDocumentService : IEducationDocumentService
         _mapper = mapper;
     }
 
+    public async Task<EducationDocumentDto> CreateAsync(EducationDocumentCreateDto dto)
+    {
+        var entity = _mapper.Map<EducationDocument>(dto);
+        entity.Id = Guid.NewGuid();
+
+        
+        entity.DocumentKind = "Education";
+
+        _context.EducationDocuments.Add(entity);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<EducationDocumentDto>(entity);
+    }
+
     public async Task<List<EducationDocumentDto>> GetByApplicantAsync(Guid applicantId)
     {
-        var list = await _context.EducationDocuments
-            .Where(x => x.Id == applicantId)
+        var docs = await _context.EducationDocuments
+            .Where(x => x.ApplicantId == applicantId)
             .ToListAsync();
 
-        return _mapper.Map<List<EducationDocumentDto>>(list);
+        return _mapper.Map<List<EducationDocumentDto>>(docs);
     }
 }
