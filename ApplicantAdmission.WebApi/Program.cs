@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ApplicantDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MainProfile).Assembly);
 
+builder.Services.AddScoped<IEducationLevelService, EducationLevelService>();
 
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IAdmissionService, AdmissionService>();
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IEducationDocumentService, EducationDocumentService>(
 builder.Services.AddScoped<IFacultyService, FacultyService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();
+builder.Services.AddScoped<IEducationDocumentTypeService, EducationDocumentTypeService>();
 
 
 builder.Services.AddFluentValidationAutoValidation();

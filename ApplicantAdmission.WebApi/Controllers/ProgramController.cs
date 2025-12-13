@@ -14,9 +14,18 @@ public class ProgramController : ControllerBase
         _service = service;
     }
 
+    
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
+    }
+
+    
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var program = await _service.GetByIdAsync(id);
+        return program == null ? NotFound() : Ok(program);
     }
 }
