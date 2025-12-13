@@ -6,9 +6,11 @@ namespace ApplicantAdmission.BusinessLogic.Interfaces
     {
         Task<ApplicantAdmissionDto?> GetByIdAsync(Guid id);
         Task<List<ApplicantAdmissionDto>> GetByApplicantAsync(Guid applicantId);
+        Task<List<ApplicantAdmissionDto>> GetByManagerAsync(Guid managerId); 
+        Task<List<ApplicantAdmissionDto>> GetAllAsync();                     
+
         Task<ApplicantAdmissionDto> CreateAsync(ApplicantAdmissionCreateDto dto);
         Task<ApplicantAdmissionDto> AssignManagerAsync(Guid admissionId, Guid managerId);
         Task<ApplicantAdmissionDto> UpdateStatusAsync(Guid admissionId, string status);
     }
 }
-

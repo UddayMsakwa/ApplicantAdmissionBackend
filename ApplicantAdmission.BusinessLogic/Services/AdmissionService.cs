@@ -102,5 +102,31 @@ namespace ApplicantAdmission.BusinessLogic.Services
             var full = await LoadFullAdmission(entity.Id);
             return _mapper.Map<ApplicantAdmissionDto>(full!);
         }
+        public async Task<List<ApplicantAdmissionDto>> GetAllAsync()
+        {
+            var list = await _context.ApplicantAdmissions
+                .Include(x => x.Applicant)
+                .Include(x => x.Manager)
+                .Include(x => x.AdmissionProgram)
+                    .ThenInclude(x => x.Program)
+                .ToListAsync();
+
+            return _mapper.Map<List<ApplicantAdmissionDto>>(list);
+        }
+
+        public async Task<List<ApplicantAdmissionDto>> GetByManagerAsync(Guid managerId)
+        {
+            var list = await _context.ApplicantAdmissions
+                .Where(x => x.ManagerId == managerId)
+                .Include(x => x.Applicant)
+                .Include(x => x.AdmissionProgram)
+                    .ThenInclude(x => x.Program)
+                .Include(x => x.Manager)
+                .ToListAsync();
+
+            return _mapper.Map<List<ApplicantAdmissionDto>>(list);
+        }
+
     }
 }
+

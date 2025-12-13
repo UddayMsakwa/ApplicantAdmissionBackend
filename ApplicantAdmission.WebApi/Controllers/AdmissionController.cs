@@ -48,5 +48,17 @@ namespace ApplicantAdmission.WebApi.Controllers
             var updated = await _service.UpdateStatusAsync(id, dto.Status);
             return Ok(updated);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _service.GetAllAsync());
+        }
+
+        [HttpGet("by-manager/{managerId:guid}")]
+        public async Task<IActionResult> GetByManager(Guid managerId)
+        {
+            return Ok(await _service.GetByManagerAsync(managerId));
+        }
+
     }
 }
