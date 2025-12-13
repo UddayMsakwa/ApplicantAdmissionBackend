@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ApplicantAdmission.BusinessLogic.Interfaces;
+﻿using ApplicantAdmission.BusinessLogic.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
 [Route("api/managers")]
