@@ -27,6 +27,7 @@ public class ApplicantController : ControllerBase
         var applicant = await _service.GetByIdAsync(id);
         return applicant == null ? NotFound() : Ok(applicant);
     }
+   
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ApplicantCreateDto dto)

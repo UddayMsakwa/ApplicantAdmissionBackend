@@ -2,6 +2,8 @@ using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Services;
 using ApplicantAdmission.BusinessLogic.Mapping;
+using ApplicantAdmission.WebApi.Middleware;
+
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -38,9 +40,10 @@ builder.Services.AddSwaggerGen();
 
 
 
-var app = builder.Build();   
+var app = builder.Build();
 
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -1,5 +1,7 @@
 ﻿using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
+using ApplicantAdmission.BusinessLogic.Exceptions;
+
 using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.DataAccess.Entities;
 using AutoMapper;
@@ -32,6 +34,8 @@ namespace ApplicantAdmission.BusinessLogic.Services
         
         public async Task<ApplicantAdmissionDto?> GetByIdAsync(Guid id)
         {
+           
+
             var entity = await LoadFullAdmission(id);
             return entity == null ? null : _mapper.Map<ApplicantAdmissionDto>(entity);
         }
@@ -72,13 +76,13 @@ namespace ApplicantAdmission.BusinessLogic.Services
                 .FirstOrDefaultAsync(x => x.Id == admissionId);
 
             if (entity == null)
-                throw new Exception("Admission not found.");
+                throw new NotFoundException("Admission not found.");
 
             var managerExists = await _context.Managers
                 .AnyAsync(x => x.Id == managerId);
 
             if (!managerExists)
-                throw new Exception("Manager not found.");
+                throw new NotFoundException("Manager not found.");
 
             entity.ManagerId = managerId;
             await _context.SaveChangesAsync();
@@ -94,7 +98,7 @@ namespace ApplicantAdmission.BusinessLogic.Services
                 .FirstOrDefaultAsync(x => x.Id == admissionId);
 
             if (entity == null)
-                throw new Exception("Admission not found.");
+                throw new NotFoundException("Admission not found.");
 
             entity.Status = status;
             await _context.SaveChangesAsync();
