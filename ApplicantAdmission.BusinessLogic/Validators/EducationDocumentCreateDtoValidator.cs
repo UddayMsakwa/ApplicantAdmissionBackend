@@ -6,16 +6,27 @@ public class EducationDocumentCreateDtoValidator
 {
     public EducationDocumentCreateDtoValidator()
     {
-        RuleFor(x => x.ApplicantId).NotEmpty();
-        RuleFor(x => x.FileId).NotEmpty();
-        RuleFor(x => x.DocumentTypeId).NotEmpty();
+        RuleFor(x => x.ApplicantId)
+            .NotEmpty()
+            .WithMessage("ApplicantId is required.");
+
+        RuleFor(x => x.FileId)
+            .NotEmpty()
+            .WithMessage("FileId is required.");
+
+        RuleFor(x => x.DocumentTypeId)
+            .NotEmpty()
+            .WithMessage("DocumentTypeId is required.");
 
         RuleFor(x => x.InstitutionName)
             .NotEmpty()
-            .MinimumLength(3);
+            .WithMessage("InstitutionName is required.")
+            .MinimumLength(3)
+            .WithMessage("InstitutionName must be at least 3 characters long.");
 
         RuleFor(x => x.GraduationYear)
-            .InclusiveBetween(1950, DateTime.UtcNow.Year);
+            .InclusiveBetween(1950, DateTime.UtcNow.Year)
+            .WithMessage("GraduationYear must be a valid past year.");
 
         RuleFor(x => x.AverageScore)
             .InclusiveBetween(0, 100)

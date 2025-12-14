@@ -1,11 +1,17 @@
 ﻿using FluentValidation;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
 
-public class ApplicantAdmissionCreateDtoValidator : AbstractValidator<ApplicantAdmissionCreateDto>
+public class ApplicantAdmissionCreateDtoValidator
+    : AbstractValidator<ApplicantAdmissionCreateDto>
 {
     public ApplicantAdmissionCreateDtoValidator()
     {
-        RuleFor(x => x.ApplicantId).NotEmpty();
-        RuleFor(x => x.AdmissionProgramId).NotEmpty();
+        RuleFor(x => x.ApplicantId)
+            .NotEmpty()
+            .WithMessage("ApplicantId is required.");
+
+        RuleFor(x => x.AdmissionProgramId)
+            .NotEmpty()
+            .WithMessage("AdmissionProgramId is required.");
     }
 }
