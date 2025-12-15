@@ -15,9 +15,8 @@ public class ApplicantAdmissionUpdateStatusDtoValidator
     public ApplicantAdmissionUpdateStatusDtoValidator()
     {
         RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Status is required.")
-            .Must(status => AllowedStatuses.Contains(status))
-            .WithMessage("Invalid admission status value.");
+    .IsInEnum()
+    .WithMessage("Invalid admission status.");
+
     }
 }

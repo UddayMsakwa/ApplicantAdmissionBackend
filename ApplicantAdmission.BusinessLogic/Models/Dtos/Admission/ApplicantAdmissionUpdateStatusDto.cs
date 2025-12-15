@@ -1,7 +1,9 @@
-﻿namespace ApplicantAdmission.BusinessLogic.Models.Dtos.Admission
+﻿using ApplicantAdmission.DataAccess.Enums;
+
+namespace ApplicantAdmission.BusinessLogic.Models.Dtos.Admission
 {
     public class ApplicantAdmissionUpdateStatusDto
     {
-        public string Status { get; set; } = null!;
+        public AdmissionStatus Status { get; set; }
     }
 }

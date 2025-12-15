@@ -3,6 +3,7 @@ using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Services;
 using ApplicantAdmission.BusinessLogic.Mapping;
 using ApplicantAdmission.WebApi.Middleware;
+using System.Text.Json.Serialization;
 
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
@@ -34,7 +35,14 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssembly(typeof(MainProfile).Assembly);
 
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

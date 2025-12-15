@@ -1,4 +1,8 @@
-﻿namespace ApplicantAdmission.DataAccess.Entities;
+﻿
+using ApplicantAdmission.DataAccess.Enums;
+
+namespace ApplicantAdmission.DataAccess.Entities;
+
 
 public class ApplicantAdmissionEntity
 {
@@ -13,6 +17,8 @@ public class ApplicantAdmissionEntity
     public Guid? ManagerId { get; set; }
     public Manager? Manager { get; set; }
 
-    public string Status { get; set; } = "Submitted";
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public AdmissionStatus Status { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }
+

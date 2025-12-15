@@ -22,5 +22,10 @@ public class ApplicantAdmissionConfiguration : IEntityTypeConfiguration<Applican
             .WithMany(x => x.ApplicantAdmissions)
             .HasForeignKey(x => x.ManagerId)
             .IsRequired(false);
+
+        builder.Property(x => x.Status)
+       .HasConversion<int>()
+       .IsRequired();
+
     }
 }
