@@ -1,8 +1,7 @@
-﻿
+﻿using System;
 using ApplicantAdmission.DataAccess.Enums;
 
 namespace ApplicantAdmission.DataAccess.Entities;
-
 
 public class ApplicantAdmissionEntity
 {
@@ -18,7 +17,6 @@ public class ApplicantAdmissionEntity
     public Manager? Manager { get; set; }
 
     public AdmissionStatus Status { get; set; }
-
     public DateTime CreatedAt { get; set; }
 }
 

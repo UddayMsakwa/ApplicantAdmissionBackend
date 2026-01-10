@@ -4,6 +4,7 @@ public class Applicant
 {
     public Guid Id { get; set; }
 
+    public Guid UserId { get; set; }
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
 
@@ -21,3 +22,4 @@ public class Applicant
     public ICollection<Document> Documents { get; set; }
         = new List<Document>();
 }
+
