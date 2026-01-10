@@ -2,6 +2,8 @@
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
 using ApplicantAdmission.DataAccess.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace ApplicantAdmission.WebApi.Controllers
 {
@@ -59,8 +61,11 @@ namespace ApplicantAdmission.WebApi.Controllers
             return Ok(created);
         }
 
+       
         
+        [Authorize(Roles = "HeadManager")]
         [HttpPost("{id:guid}/assign-manager")]
+
         public async Task<IActionResult> AssignManager(
             Guid id,
             [FromBody] ApplicantAdmissionAssignManagerDto dto)

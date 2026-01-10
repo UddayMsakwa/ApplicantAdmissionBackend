@@ -7,6 +7,8 @@ public class Applicant
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
 
+    public UserEntity User { get; set; } = null!;
+
     public string FullName { get; set; } = null!;
     public string Phone { get; set; } = null!;
     public DateTime DateOfBirth { get; set; }

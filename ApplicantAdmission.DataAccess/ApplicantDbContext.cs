@@ -1,5 +1,8 @@
 ﻿using ApplicantAdmission.DataAccess.Entities;
+using ApplicantAdmission.DataAccess.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ApplicantAdmission.DataAccess;
 
@@ -20,6 +23,7 @@ public class ApplicantDbContext : DbContext
     public DbSet<ProgramEntity> Programs => Set<ProgramEntity>();
     public DbSet<AdmissionProgram> AdmissionPrograms => Set<AdmissionProgram>();
     public DbSet<ApplicantAdmissionEntity> ApplicantAdmissions => Set<ApplicantAdmissionEntity>();
+    public DbSet<UserEntity> Users => Set<UserEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +41,11 @@ public class ApplicantDbContext : DbContext
 
         var diplomaTypeId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         var transcriptTypeId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+
+        
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(x => x.Email)
+            .IsUnique();
 
         
         modelBuilder.Entity<Faculty>().HasData(new Faculty
@@ -70,11 +79,20 @@ public class ApplicantDbContext : DbContext
             Id = managerId,
             FullName = "Admin Manager",
             Email = "manager@test.com",
-            PasswordHash = "hashed_pass",
+            PasswordHash = Hash("Manager123"),
             Role = "Admin"
         });
 
-        
+        modelBuilder.Entity<UserEntity>().HasData(new UserEntity
+        {
+            Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
+            Email = "head@admin.com",
+            PasswordHash = "Admin123", 
+            Role = UserRole.HeadManager,
+
+            IsActive = true
+        });
+
         modelBuilder.Entity<EducationDocumentType>().HasData(
             new EducationDocumentType
             {
@@ -90,6 +108,15 @@ public class ApplicantDbContext : DbContext
                 LevelId = bachelorLevelId,
                 NextLevelId = null
             }
+        );
+    }
+
+    
+    private static string Hash(string password)
+    {
+        using var sha = SHA256.Create();
+        return Convert.ToBase64String(
+            sha.ComputeHash(Encoding.UTF8.GetBytes(password))
         );
     }
 }

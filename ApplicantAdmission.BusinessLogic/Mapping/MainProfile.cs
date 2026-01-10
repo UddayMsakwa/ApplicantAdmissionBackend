@@ -40,10 +40,15 @@ namespace ApplicantAdmission.BusinessLogic.Mapping
 
             CreateMap<Manager, ManagerDto>();
 
-            
-            CreateMap<ProgramEntity, ProgramDto>();
 
-            
+            CreateMap<ProgramEntity, ProgramDto>()
+    .ForMember(dest => dest.FacultyName,
+        opt => opt.MapFrom(src => src.Faculty.Name))
+    .ForMember(dest => dest.LevelName,
+        opt => opt.MapFrom(src => src.Level.Name));
+
+
+
             CreateMap<Faculty, FacultyDto>();
         }
     }

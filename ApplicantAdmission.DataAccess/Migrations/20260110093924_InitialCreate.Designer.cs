@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ApplicantAdmission.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicantDbContext))]
-    [Migration("20251211203709_AddEducationAverageScore")]
-    partial class AddEducationAverageScore
+    [Migration("20260110093924_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,7 +81,12 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Applicants");
                 });
@@ -104,9 +109,8 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Property<Guid?>("ManagerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -169,6 +173,20 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasIndex("NextLevelId");
 
                     b.ToTable("EducationDocumentTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Diploma"
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Transcript"
+                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationLevel", b =>
@@ -273,7 +291,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             Email = "manager@test.com",
                             FullName = "Admin Manager",
-                            PasswordHash = "hashed_pass",
+                            PasswordHash = "YbOtJDNsIFFVc9x9h1y5KV6EYs7GRcNgSsWPHiQeIOA=",
                             Role = "Admin"
                         });
                 });
@@ -309,6 +327,44 @@ namespace ApplicantAdmission.DataAccess.Migrations
                             FacultyId = new Guid("11111111-1111-1111-1111-111111111111"),
                             LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
                             Name = "Computer Science"
+                        });
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.UserEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            Email = "head@admin.com",
+                            IsActive = true,
+                            PasswordHash = "Admin123",
+                            Role = 1
                         });
                 });
 
@@ -361,6 +417,17 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Program");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Applicant", b =>
+                {
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
