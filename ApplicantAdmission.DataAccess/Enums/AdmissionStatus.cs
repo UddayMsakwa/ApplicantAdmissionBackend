@@ -3,7 +3,7 @@
 public enum AdmissionStatus
 {
     Submitted = 0,
-    InReview = 1,
+   UnderReview = 1,
     Accepted = 2,
     Rejected = 3
 }

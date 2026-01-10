@@ -61,20 +61,44 @@ namespace ApplicantAdmission.WebApi.Controllers
             return Ok(created);
         }
 
-       
-        
-        [Authorize(Roles = "HeadManager")]
-        [HttpPost("{id:guid}/assign-manager")]
-
-        public async Task<IActionResult> AssignManager(
-            Guid id,
-            [FromBody] ApplicantAdmissionAssignManagerDto dto)
+        [Authorize(Roles = "Applicant")]
+        [HttpPost]
+        public async Task<IActionResult> CreateAdmission(CreateAdmissionDto dto)
         {
-            var updated = await _service.AssignManagerAsync(id, dto.ManagerId);
-            return Ok(updated);
+            var userId = Guid.Parse(User.FindFirst("userId")!.Value);
+            return Ok(await _admissionService.CreateAsync(dto, userId));
         }
 
-        
+        [Authorize(Roles = "Manager")]
+        [HttpGet("assigned")]
+        public async Task<IActionResult> GetAssignedAdmissions()
+        {
+            var userId = Guid.Parse(User.FindFirst("userId")!.Value);
+            return Ok(await _admissionService.GetAssignedAsync(userId));
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(
+    Guid id,
+    UpdateAdmissionStatusDto dto)
+        {
+            return Ok(await _admissionService.UpdateStatusAsync(id, dto.Status));
+        }
+
+
+        [Authorize(Roles = "HeadManager")]
+        [HttpPost("{id}/assign-manager")]
+        public async Task<IActionResult> AssignManager(
+    Guid id,
+    AssignManagerDto dto)
+        {
+            await _admissionService.AssignManagerAsync(id, dto.ManagerId);
+            return NoContent();
+        }
+
+
+
         [HttpPatch("{id:guid}/status")]
         public async Task<IActionResult> UpdateStatus(
             Guid id,

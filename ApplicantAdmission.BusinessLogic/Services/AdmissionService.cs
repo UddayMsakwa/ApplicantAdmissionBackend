@@ -119,6 +119,10 @@ namespace ApplicantAdmission.BusinessLogic.Services
             if (!await _context.Managers.AnyAsync(x => x.Id == managerId))
                 throw new NotFoundException("Manager not found.");
 
+            if (admission.ManagerId != null)
+                throw new BadRequestException("Manager already assigned");
+
+
             entity.ManagerId = managerId;
             await _context.SaveChangesAsync();
 
@@ -129,6 +133,13 @@ namespace ApplicantAdmission.BusinessLogic.Services
         {
             var entity = await _context.ApplicantAdmissions.FindAsync(admissionId)
                 ?? throw new NotFoundException("Admission not found.");
+
+            if (admission.Status == AdmissionStatus.Accepted ||
+    admission.Status == AdmissionStatus.Rejected)
+            {
+                throw new BadRequestException("Final status cannot be changed");
+            }
+
 
             entity.Status = status;
             await _context.SaveChangesAsync();

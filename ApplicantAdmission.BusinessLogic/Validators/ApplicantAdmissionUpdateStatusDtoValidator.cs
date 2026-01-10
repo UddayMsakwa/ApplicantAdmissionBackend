@@ -7,7 +7,7 @@ public class ApplicantAdmissionUpdateStatusDtoValidator
     private static readonly string[] AllowedStatuses =
     {
         "Submitted",
-        "InReview",
+        "UnderReview",
         "Accepted",
         "Rejected"
     };
