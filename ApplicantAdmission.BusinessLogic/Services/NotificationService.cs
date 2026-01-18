@@ -18,7 +18,7 @@ public class NotificationService : INotificationService
     {
         var email = await _db.Applicants
             .Where(a => a.Id == applicantId)
-            .Select(a => a.Email)
+            .Join(_db.Users, a => a.UserId, u => u.Id, (a, u) => u.Email)
             .FirstOrDefaultAsync();
 
         if (string.IsNullOrWhiteSpace(email)) return;
@@ -27,7 +27,7 @@ public class NotificationService : INotificationService
         {
             Id = Guid.NewGuid(),
             ToEmail = email,
-            Subject = "Applicant Notification",
+            Subject = "Applicant notification",
             Body = message,
             Status = "Queued",
             CreatedAt = DateTime.UtcNow
@@ -49,7 +49,7 @@ public class NotificationService : INotificationService
         {
             Id = Guid.NewGuid(),
             ToEmail = email,
-            Subject = "Manager Notification",
+            Subject = "Manager notification",
             Body = message,
             Status = "Queued",
             CreatedAt = DateTime.UtcNow

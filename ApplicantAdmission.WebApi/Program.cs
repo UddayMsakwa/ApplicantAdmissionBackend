@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using NLog.Web;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,8 @@ builder.Services.AddDbContext<ApplicantDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MainProfile).Assembly);
 
-
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 builder.Services.AddScoped<IEducationLevelService, EducationLevelService>();
 builder.Services.AddScoped<IEducationDocumentTypeService, EducationDocumentTypeService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();

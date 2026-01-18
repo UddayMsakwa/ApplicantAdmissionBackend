@@ -49,7 +49,25 @@ public class ApplicantService : IApplicantService
 
         _context.Users.Add(user);
 
-        var applicant = new Applicant
+        public async Task<ApplicantDto> UpdateAsync(Guid id, ApplicantUpdateDto dto)
+    {
+        var applicant = await _context.Applicants
+            .Include(a => a.Admissions)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (applicant == null)
+            throw new Exception("Applicant not found");
+
+        if (applicant.Admissions.Any(a => a.Status == AdmissionStatus.Closed))
+            throw new InvalidOperationException("Cannot modify applicant with closed admission");
+
+        _mapper.Map(dto, applicant);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<ApplicantDto>(applicant);
+    }
+
+    var applicant = new Applicant
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,

@@ -89,11 +89,11 @@ public class ApplicantDbContext : DbContext
         {
             Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
             Email = "head@admin.com",
-            PasswordHash = "Admin123", 
+            PasswordHash = Hash("Admin123"),
             Role = UserRole.HeadManager,
-
             IsActive = true
         });
+
 
         modelBuilder.Entity<EducationDocumentType>().HasData(
             new EducationDocumentType

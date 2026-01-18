@@ -6,6 +6,7 @@ namespace ApplicantAdmission.FilesApi.Controllers;
 
 [ApiController]
 [Route("api/files")]
+[Authorize] 
 public class FilesController : ControllerBase
 {
     private readonly IFileStorage _storage;
@@ -38,3 +39,5 @@ public class FilesController : ControllerBase
         return File(result.Content, result.ContentType, result.FileName);
     }
 }
+
+

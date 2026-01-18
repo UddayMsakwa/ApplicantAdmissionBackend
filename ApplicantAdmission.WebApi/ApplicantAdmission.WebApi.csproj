@@ -16,12 +16,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="NLog" Version="6.0.7" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<None Include="nlog.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\ApplicantAdmission.BusinessLogic\ApplicantAdmission.BusinessLogic.csproj" />
     <ProjectReference Include="..\ApplicantAdmission.DataAccess\ApplicantAdmission.DataAccess.csproj" />
     <ProjectReference Include="..\ApplicantAdmission.Infrastructure\ApplicantAdmission.Infrastructure.csproj" />

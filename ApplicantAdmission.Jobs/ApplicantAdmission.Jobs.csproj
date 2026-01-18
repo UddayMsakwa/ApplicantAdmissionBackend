@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
+	
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -10,12 +11,22 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
+    <PackageReference Include="NLog" Version="6.0.7" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Quartz" Version="3.15.1" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.15.1" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.15.1" />
   </ItemGroup>
+	
+	<ItemGroup>
+		<None Include="nlog.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <ProjectReference Include="..\ApplicantAdmission.BusinessLogic\ApplicantAdmission.BusinessLogic.csproj" />
     <ProjectReference Include="..\ApplicantAdmission.DataAccess\ApplicantAdmission.DataAccess.csproj" />
     <ProjectReference Include="..\ApplicantAdmission.Infrastructure\ApplicantAdmission.Infrastructure.csproj" />
