@@ -4,6 +4,7 @@ public enum AdmissionStatus
 {
     Draft = 0,
     Submitted = 1,
-    Accepted = 2,
-    Rejected = 3
+    InReview = 2,
+    Accepted = 3,
+    Rejected = 4,
 }

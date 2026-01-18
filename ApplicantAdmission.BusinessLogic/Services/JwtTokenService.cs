@@ -20,7 +20,7 @@ public class JwtTokenService
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email)
         };
@@ -42,3 +42,7 @@ public class JwtTokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
+
+
+   
+

@@ -4,9 +4,12 @@ using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Document;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Education;
-using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Program;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Faculty;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Admin;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Head;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager; 
+
 
 
 namespace ApplicantAdmission.BusinessLogic.Mapping
@@ -26,7 +29,10 @@ namespace ApplicantAdmission.BusinessLogic.Mapping
 
             CreateMap<ApplicantAdmissionCreateDto, ApplicantAdmissionEntity>();
 
-            
+            CreateMap<UserEntity, UserDto>();
+
+            CreateMap<Manager, ManagerDto>();
+
             CreateMap<Document, DocumentDto>();
             CreateMap<EducationDocument, EducationDocumentDto>();
             

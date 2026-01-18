@@ -24,6 +24,8 @@ public class ApplicantDbContext : DbContext
     public DbSet<AdmissionProgram> AdmissionPrograms => Set<AdmissionProgram>();
     public DbSet<ApplicantAdmissionEntity> ApplicantAdmissions => Set<ApplicantAdmissionEntity>();
     public DbSet<UserEntity> Users => Set<UserEntity>();
+    public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

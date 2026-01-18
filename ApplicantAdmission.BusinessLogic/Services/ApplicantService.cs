@@ -1,31 +1,32 @@
 ﻿using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
-using ApplicantAdmission.BusinessLogic.Services;
-using ApplicantAdmission.DataAccess.Enums; 
 using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.DataAccess.Entities;
+using ApplicantAdmission.DataAccess.Enums;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+
+namespace ApplicantAdmission.BusinessLogic.Services;
 
 public class ApplicantService : IApplicantService
 {
     private readonly ApplicantDbContext _context;
     private readonly IMapper _mapper;
-    private readonly INotificationService _notificationService;
+    private readonly INotificationService _notification;
 
     public ApplicantService(
         ApplicantDbContext context,
         IMapper mapper,
-        INotificationService notificationService)
+        INotificationService notification)
     {
         _context = context;
         _mapper = mapper;
-        _notificationService = notificationService;
+        _notification = notification;
     }
 
     public async Task<ApplicantDto?> GetByIdAsync(Guid id)
     {
-        var entity = await _context.Applicants.FirstOrDefaultAsync(x => x.Id == id);
+        var entity = await _context.Applicants.FindAsync(id);
         return entity == null ? null : _mapper.Map<ApplicantDto>(entity);
     }
 
@@ -47,7 +48,6 @@ public class ApplicantService : IApplicantService
         };
 
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
 
         var applicant = new Applicant
         {
@@ -63,10 +63,7 @@ public class ApplicantService : IApplicantService
         _context.Applicants.Add(applicant);
         await _context.SaveChangesAsync();
 
-        await _notificationService.NotifyApplicantAsync(
-            applicant.Id,
-            "Your applicant account has been created"
-        );
+        await _notification.NotifyApplicantAsync(applicant.Id, "Registration successful");
 
         return _mapper.Map<ApplicantDto>(applicant);
     }

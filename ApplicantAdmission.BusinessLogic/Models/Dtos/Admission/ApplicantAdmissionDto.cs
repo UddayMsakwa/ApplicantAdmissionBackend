@@ -1,4 +1,5 @@
 ﻿using ApplicantAdmission.DataAccess.Enums;
+using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
 
 namespace ApplicantAdmission.BusinessLogic.Models.Dtos.Admission;
 

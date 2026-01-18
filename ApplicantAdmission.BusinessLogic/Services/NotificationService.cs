@@ -1,20 +1,60 @@
-﻿using System;
-using System.Threading.Tasks;
-using ApplicantAdmission.BusinessLogic.Interfaces;
+﻿using ApplicantAdmission.BusinessLogic.Interfaces;
+using ApplicantAdmission.DataAccess;
+using ApplicantAdmission.DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApplicantAdmission.BusinessLogic.Services;
 
 public class NotificationService : INotificationService
 {
-    public Task NotifyApplicantAsync(Guid applicantId, string message)
+    private readonly ApplicantDbContext _db;
+
+    public NotificationService(ApplicantDbContext db)
     {
-        Console.WriteLine($"[APPLICANT {applicantId}] {message}");
-        return Task.CompletedTask;
+        _db = db;
     }
 
-    public Task NotifyManagerAsync(Guid managerId, string message)
+    public async Task NotifyApplicantAsync(Guid applicantId, string message)
     {
-        Console.WriteLine($"[MANAGER {managerId}] {message}");
-        return Task.CompletedTask;
+        var email = await _db.Applicants
+            .Where(a => a.Id == applicantId)
+            .Select(a => a.Email)
+            .FirstOrDefaultAsync();
+
+        if (string.IsNullOrWhiteSpace(email)) return;
+
+        _db.Notifications.Add(new NotificationEntity
+        {
+            Id = Guid.NewGuid(),
+            ToEmail = email,
+            Subject = "Applicant Notification",
+            Body = message,
+            Status = "Queued",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task NotifyManagerAsync(Guid managerId, string message)
+    {
+        var email = await _db.Managers
+            .Where(m => m.Id == managerId)
+            .Select(m => m.Email)
+            .FirstOrDefaultAsync();
+
+        if (string.IsNullOrWhiteSpace(email)) return;
+
+        _db.Notifications.Add(new NotificationEntity
+        {
+            Id = Guid.NewGuid(),
+            ToEmail = email,
+            Subject = "Manager Notification",
+            Body = message,
+            Status = "Queued",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
     }
 }

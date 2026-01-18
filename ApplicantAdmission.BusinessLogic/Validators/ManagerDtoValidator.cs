@@ -1,5 +1,7 @@
-﻿using FluentValidation;
-using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
+﻿using ApplicantAdmission.BusinessLogic.Models.Dtos.Manager;
+using FluentValidation;
+
+namespace ApplicantAdmission.BusinessLogic.Validators;
 
 public class ManagerDtoValidator : AbstractValidator<ManagerDto>
 {
