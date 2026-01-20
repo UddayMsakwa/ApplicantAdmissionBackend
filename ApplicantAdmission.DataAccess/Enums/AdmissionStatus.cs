@@ -2,9 +2,9 @@
 
 public enum AdmissionStatus
 {
-    Draft = 0,
-    Submitted = 1,
-    InReview = 2,
-    Accepted = 3,
-    Rejected = 4,
+    Created = 0,
+    UnderReview = 1,
+    Confirmed = 2,
+    Rejected = 3,
+    Closed = 4
 }

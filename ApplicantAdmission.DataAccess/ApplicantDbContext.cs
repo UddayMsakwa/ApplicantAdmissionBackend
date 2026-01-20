@@ -1,8 +1,8 @@
 ﻿using ApplicantAdmission.DataAccess.Entities;
+using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.DataAccess.Enums;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ApplicantAdmission.DataAccess;
 
@@ -14,7 +14,6 @@ public class ApplicantDbContext : DbContext
     }
 
     public DbSet<Applicant> Applicants => Set<Applicant>();
-    public DbSet<Manager> Managers => Set<Manager>();
     public DbSet<Document> Documents => Set<Document>();
     public DbSet<EducationDocument> EducationDocuments => Set<EducationDocument>();
     public DbSet<EducationLevel> EducationLevels => Set<EducationLevel>();
@@ -25,6 +24,7 @@ public class ApplicantDbContext : DbContext
     public DbSet<ApplicantAdmissionEntity> ApplicantAdmissions => Set<ApplicantAdmissionEntity>();
     public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
+    public DbSet<EducationDocumentTypeNextLevel> EducationDocumentTypeNextLevels => Set<EducationDocumentTypeNextLevel>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,91 +34,52 @@ public class ApplicantDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicantDbContext).Assembly);
         modelBuilder.Entity<Document>().UseTptMappingStrategy();
 
-        
-        var facultyId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var bachelorLevelId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var programId = Guid.Parse("33333333-3333-3333-3333-333333333333");
-        var admissionProgramId = Guid.Parse("44444444-4444-4444-4444-444444444444");
-        var managerId = Guid.Parse("55555555-5555-5555-5555-555555555555");
-
-        var diplomaTypeId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        var transcriptTypeId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-
-        
         modelBuilder.Entity<UserEntity>()
             .HasIndex(x => x.Email)
             .IsUnique();
 
-        
-        modelBuilder.Entity<Faculty>().HasData(new Faculty
-        {
-            Id = facultyId,
-            Name = "Engineering"
-        });
-
-        modelBuilder.Entity<EducationLevel>().HasData(new EducationLevel
-        {
-            Id = bachelorLevelId,
-            Name = "Bachelor"
-        });
-
-        modelBuilder.Entity<ProgramEntity>().HasData(new ProgramEntity
-        {
-            Id = programId,
-            Name = "Computer Science",
-            FacultyId = facultyId,
-            LevelId = bachelorLevelId
-        });
-
-        modelBuilder.Entity<AdmissionProgram>().HasData(new AdmissionProgram
-        {
-            Id = admissionProgramId,
-            ProgramId = programId
-        });
-
-        modelBuilder.Entity<Manager>().HasData(new Manager
-        {
-            Id = managerId,
-            FullName = "Admin Manager",
-            Email = "manager@test.com",
-            PasswordHash = Hash("Manager123"),
-            Role = "Admin"
-        });
-
-        modelBuilder.Entity<UserEntity>().HasData(new UserEntity
-        {
-            Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
-            Email = "head@admin.com",
-            PasswordHash = Hash("Admin123"),
-            Role = UserRole.HeadManager,
-            IsActive = true
-        });
-
-
-        modelBuilder.Entity<EducationDocumentType>().HasData(
-            new EducationDocumentType
+        modelBuilder.Entity<UserEntity>().HasData(
+            new UserEntity
             {
-                Id = diplomaTypeId,
-                Name = "Diploma",
-                LevelId = bachelorLevelId,
-                NextLevelId = null
+                Id = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000001"),
+                Email = "admin@test.local",
+                FullName = "Seeded Admin",
+                PasswordHash = HashWithSalt("AdminSeeded!23", "AAAAAAAAAAAAAAAAAAAAAA=="),
+                Role = UserRole.Admin,
+                IsActive = true
             },
-            new EducationDocumentType
+            new UserEntity
             {
-                Id = transcriptTypeId,
-                Name = "Transcript",
-                LevelId = bachelorLevelId,
-                NextLevelId = null
+                Id = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000002"),
+                Email = "mgr1@test.local",
+                FullName = "Seeded Manager 1",
+                PasswordHash = HashWithSalt("SeededPwd!23", "AQEBAQEBAQEBAQEBAQEBAQ=="),
+                Role = UserRole.Manager,
+                IsActive = true
+            },
+            new UserEntity
+            {
+                Id = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000003"),
+                Email = "head1@test.local",
+                FullName = "Seeded Head 1",
+                PasswordHash = HashWithSalt("HeadPwd!23", "AgICAgICAgICAgICAgICAg=="),
+                Role = UserRole.HeadManager,
+                IsActive = true
             }
         );
     }
 
-    
-    private static string Hash(string password)
+    private static string HashWithSalt(string password, string saltB64)
     {
-        using var sha = SHA256.Create();
-        return Convert.ToBase64String(
-            sha.ComputeHash(Encoding.UTF8.GetBytes(password))
-        );
+        var salt = Convert.FromBase64String(saltB64);
+
+        var hash = KeyDerivation.Pbkdf2(
+            password: password,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100_000,
+            numBytesRequested: 32);
+
+        return Convert.ToBase64String(salt) + "." + Convert.ToBase64String(hash);
     }
 }

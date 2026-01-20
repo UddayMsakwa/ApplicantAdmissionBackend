@@ -1,6 +1,8 @@
 ﻿using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ApplicantAdmission.WebApi.Controllers;
 
@@ -15,24 +17,31 @@ public class ApplicantController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
         var applicant = await _service.GetByIdAsync(id);
         return applicant == null ? NotFound() : Ok(applicant);
     }
-   
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ApplicantCreateDto dto)
+    [Authorize(Policy = "ApplicantOnly")]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMe()
     {
-        var created = await _service.CreateAsync(dto);
-        return Ok(created);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Ok(await _service.GetMeAsync(userId));
+    }
+
+    [Authorize(Policy = "ApplicantOnly")]
+    [HttpPatch("me")]
+    public async Task<IActionResult> UpdateMe([FromBody] ApplicantUpdateDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Ok(await _service.UpdateMeAsync(userId, dto));
     }
 }

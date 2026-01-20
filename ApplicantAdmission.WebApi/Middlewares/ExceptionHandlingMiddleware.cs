@@ -28,6 +28,14 @@ public class ExceptionHandlingMiddleware
         {
             await WriteError(context, HttpStatusCode.NotFound, ex.Message);
         }
+        catch (ConflictException ex)
+        {
+            await WriteError(context, HttpStatusCode.Conflict, ex.Message);
+        }
+        catch (UnauthorizedException ex)
+        {
+            await WriteError(context, HttpStatusCode.Unauthorized, ex.Message);
+        }
         catch (BusinessRuleException ex)
         {
             await WriteError(context, HttpStatusCode.BadRequest, ex.Message);

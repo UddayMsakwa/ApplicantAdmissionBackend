@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApplicantAdmission.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +18,8 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 name: "EducationLevels",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -53,18 +55,21 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Managers",
+                name: "Notifications",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: false),
-                    FullName = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false)
+                    ToEmail = table.Column<string>(type: "text", nullable: false),
+                    Subject = table.Column<string>(type: "text", nullable: false),
+                    Body = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Error = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Managers", x => x.Id);
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -74,6 +79,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    FullName = table.Column<string>(type: "text", nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -88,8 +94,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    LevelId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NextLevelId = table.Column<Guid>(type: "uuid", nullable: true)
+                    LevelId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -97,12 +102,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     table.ForeignKey(
                         name: "FK_EducationDocumentTypes_EducationLevels_LevelId",
                         column: x => x.LevelId,
-                        principalTable: "EducationLevels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EducationDocumentTypes_EducationLevels_NextLevelId",
-                        column: x => x.NextLevelId,
                         principalTable: "EducationLevels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -115,7 +114,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LevelId = table.Column<Guid>(type: "uuid", nullable: false)
+                    LevelId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,13 +138,12 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
-                    Gender = table.Column<string>(type: "text", nullable: false),
                     Citizenship = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -157,6 +155,30 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EducationDocumentTypeNextLevels",
+                columns: table => new
+                {
+                    DocumentTypeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    NextLevelId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EducationDocumentTypeNextLevels", x => new { x.DocumentTypeId, x.NextLevelId });
+                    table.ForeignKey(
+                        name: "FK_EducationDocumentTypeNextLevels_EducationDocumentTypes_Docu~",
+                        column: x => x.DocumentTypeId,
+                        principalTable: "EducationDocumentTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EducationDocumentTypeNextLevels_EducationLevels_NextLevelId",
+                        column: x => x.NextLevelId,
+                        principalTable: "EducationLevels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -210,7 +232,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ApplicantId = table.Column<Guid>(type: "uuid", nullable: false),
                     AdmissionProgramId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ManagerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ManagerUserId = table.Column<Guid>(type: "uuid", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -230,10 +252,11 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicantAdmissions_Managers_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "Managers",
-                        principalColumn: "Id");
+                        name: "FK_ApplicantAdmissions_Users_ManagerUserId",
+                        column: x => x.ManagerUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -284,43 +307,14 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "EducationLevels",
-                columns: new[] { "Id", "Name" },
-                values: new object[] { new Guid("22222222-2222-2222-2222-222222222222"), "Bachelor" });
-
-            migrationBuilder.InsertData(
-                table: "Faculties",
-                columns: new[] { "Id", "Name" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), "Engineering" });
-
-            migrationBuilder.InsertData(
-                table: "Managers",
-                columns: new[] { "Id", "Email", "FullName", "PasswordHash", "Role" },
-                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "manager@test.com", "Admin Manager", "YbOtJDNsIFFVc9x9h1y5KV6EYs7GRcNgSsWPHiQeIOA=", "Admin" });
-
-            migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "IsActive", "PasswordHash", "Role" },
-                values: new object[] { new Guid("99999999-9999-9999-9999-999999999999"), "head@admin.com", true, "Admin123", 1 });
-
-            migrationBuilder.InsertData(
-                table: "EducationDocumentTypes",
-                columns: new[] { "Id", "LevelId", "Name", "NextLevelId" },
+                columns: new[] { "Id", "Email", "FullName", "IsActive", "PasswordHash", "Role" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new Guid("22222222-2222-2222-2222-222222222222"), "Diploma", null },
-                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new Guid("22222222-2222-2222-2222-222222222222"), "Transcript", null }
+                    { new Guid("aaaaaaaa-0000-0000-0000-000000000001"), "admin@test.local", "Seeded Admin", true, "AAAAAAAAAAAAAAAAAAAAAA==.EnhHDOCZohHrqGP85zO7Zipwzs4q0OhgUwZQysGSz78=", 0 },
+                    { new Guid("aaaaaaaa-0000-0000-0000-000000000002"), "mgr1@test.local", "Seeded Manager 1", true, "AQEBAQEBAQEBAQEBAQEBAQ==.T2OFoGXsyB+4m6EU8Cqe+ZayYvxhQGGdxiuZvxXDUYY=", 2 },
+                    { new Guid("aaaaaaaa-0000-0000-0000-000000000003"), "head1@test.local", "Seeded Head 1", true, "AgICAgICAgICAgICAgICAg==.J+1k/wkwqW+NmBShThK3HzP0VTbZ9il8VemNnUxuy94=", 1 }
                 });
-
-            migrationBuilder.InsertData(
-                table: "Programs",
-                columns: new[] { "Id", "FacultyId", "LevelId", "Name" },
-                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("11111111-1111-1111-1111-111111111111"), new Guid("22222222-2222-2222-2222-222222222222"), "Computer Science" });
-
-            migrationBuilder.InsertData(
-                table: "AdmissionPrograms",
-                columns: new[] { "Id", "ProgramId" },
-                values: new object[] { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("33333333-3333-3333-3333-333333333333") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdmissionPrograms_ProgramId",
@@ -338,9 +332,9 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 column: "ApplicantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicantAdmissions_ManagerId",
+                name: "IX_ApplicantAdmissions_ManagerUserId",
                 table: "ApplicantAdmissions",
-                column: "ManagerId");
+                column: "ManagerUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Applicants_UserId",
@@ -363,14 +357,14 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 column: "DocumentTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EducationDocumentTypeNextLevels_NextLevelId",
+                table: "EducationDocumentTypeNextLevels",
+                column: "NextLevelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EducationDocumentTypes_LevelId",
                 table: "EducationDocumentTypes",
                 column: "LevelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EducationDocumentTypes_NextLevelId",
-                table: "EducationDocumentTypes",
-                column: "NextLevelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Programs_FacultyId",
@@ -399,13 +393,16 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 name: "EducationDocuments");
 
             migrationBuilder.DropTable(
+                name: "EducationDocumentTypeNextLevels");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
+
+            migrationBuilder.DropTable(
                 name: "PassportDocuments");
 
             migrationBuilder.DropTable(
                 name: "AdmissionPrograms");
-
-            migrationBuilder.DropTable(
-                name: "Managers");
 
             migrationBuilder.DropTable(
                 name: "EducationDocumentTypes");

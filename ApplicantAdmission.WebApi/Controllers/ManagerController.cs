@@ -8,7 +8,7 @@ namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
 [Route("api/manager")]
-[Authorize(Policy = "ManagerOnly")]
+[Authorize(Policy = "ManagerAccess")]
 public class ManagerController : ControllerBase
 {
     private readonly IManagerService _service;

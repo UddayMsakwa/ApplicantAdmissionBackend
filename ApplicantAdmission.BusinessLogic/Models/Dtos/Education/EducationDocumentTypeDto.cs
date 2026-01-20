@@ -4,6 +4,8 @@ public class EducationDocumentTypeDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public Guid LevelId { get; set; }
+    public int LevelId { get; set; }
     public Guid? NextLevelId { get; set; }
+
+    public List<int> NextLevelIds { get; set; } = new();
 }

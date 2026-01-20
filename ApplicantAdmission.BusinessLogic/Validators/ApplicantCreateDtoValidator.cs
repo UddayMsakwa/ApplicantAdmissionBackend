@@ -32,10 +32,6 @@ public class ApplicantCreateDtoValidator
             .NotEmpty()
             .WithMessage("Citizenship is required.");
 
-        RuleFor(x => x.Gender)
-            .NotEmpty()
-            .WithMessage("Gender is required.");
-
         RuleFor(x => x.DateOfBirth)
             .LessThan(DateTime.UtcNow)
             .WithMessage("DateOfBirth must be in the past.");

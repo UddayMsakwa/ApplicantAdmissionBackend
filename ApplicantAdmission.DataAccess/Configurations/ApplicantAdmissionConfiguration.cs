@@ -12,20 +12,23 @@ public class ApplicantAdmissionConfiguration : IEntityTypeConfiguration<Applican
 
         builder.HasOne(x => x.Applicant)
             .WithMany(x => x.Admissions)
-            .HasForeignKey(x => x.ApplicantId);
+            .HasForeignKey(x => x.ApplicantId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.AdmissionProgram)
             .WithMany(x => x.ApplicantAdmissions)
-            .HasForeignKey(x => x.AdmissionProgramId);
+            .HasForeignKey(x => x.AdmissionProgramId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.Manager)
-            .WithMany(x => x.ApplicantAdmissions)
-            .HasForeignKey(x => x.ManagerId)
-            .IsRequired(false);
+        builder.HasOne(x => x.ManagerUser)
+            .WithMany()
+            .HasForeignKey(x => x.ManagerUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.Property(x => x.Status)
-       .HasConversion<int>()
-       .IsRequired();
+            .HasConversion<int>()
+            .IsRequired();
 
+        builder.Property(x => x.CreatedAt).IsRequired();
     }
 }

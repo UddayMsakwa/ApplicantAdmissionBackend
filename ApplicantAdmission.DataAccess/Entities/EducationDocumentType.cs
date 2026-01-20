@@ -3,12 +3,13 @@
 public class EducationDocumentType
 {
     public Guid Id { get; set; }
+    public string Name { get; set; } = "";
 
-    public string Name { get; set; } = null!;
-
-    public Guid LevelId { get; set; }
+    
+    public int LevelId { get; set; }
     public EducationLevel Level { get; set; } = null!;
 
-    public Guid? NextLevelId { get; set; }
-    public EducationLevel? NextLevel { get; set; }
+    
+    public ICollection<EducationDocumentTypeNextLevel> NextLevels { get; set; }
+        = new List<EducationDocumentTypeNextLevel>();
 }

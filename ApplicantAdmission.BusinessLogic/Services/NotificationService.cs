@@ -16,6 +16,7 @@ public class NotificationService : INotificationService
 
     public async Task NotifyApplicantAsync(Guid applicantId, string message)
     {
+        
         var email = await _db.Applicants
             .Where(a => a.Id == applicantId)
             .Join(_db.Users, a => a.UserId, u => u.Id, (a, u) => u.Email)
@@ -23,34 +24,31 @@ public class NotificationService : INotificationService
 
         if (string.IsNullOrWhiteSpace(email)) return;
 
-        _db.Notifications.Add(new NotificationEntity
-        {
-            Id = Guid.NewGuid(),
-            ToEmail = email,
-            Subject = "Applicant notification",
-            Body = message,
-            Status = "Queued",
-            CreatedAt = DateTime.UtcNow
-        });
-
-        await _db.SaveChangesAsync();
+        await NotifyEmailAsync(email, "Applicant notification", message);
     }
 
-    public async Task NotifyManagerAsync(Guid managerId, string message)
+    public async Task NotifyStaffAsync(Guid staffUserId, string message)
     {
-        var email = await _db.Managers
-            .Where(m => m.Id == managerId)
-            .Select(m => m.Email)
-            .FirstOrDefaultAsync();
+        var staff = await _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == staffUserId);
 
-        if (string.IsNullOrWhiteSpace(email)) return;
+        if (staff == null) return;
+        if (string.IsNullOrWhiteSpace(staff.Email)) return;
+
+        await NotifyEmailAsync(staff.Email, "Staff notification", message);
+    }
+
+    public async Task NotifyEmailAsync(string toEmail, string subject, string body)
+    {
+        if (string.IsNullOrWhiteSpace(toEmail)) return;
 
         _db.Notifications.Add(new NotificationEntity
         {
             Id = Guid.NewGuid(),
-            ToEmail = email,
-            Subject = "Manager notification",
-            Body = message,
+            ToEmail = toEmail,
+            Subject = subject,
+            Body = body,
             Status = "Queued",
             CreatedAt = DateTime.UtcNow
         });

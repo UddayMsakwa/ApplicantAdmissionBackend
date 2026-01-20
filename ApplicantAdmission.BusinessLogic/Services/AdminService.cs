@@ -22,47 +22,41 @@ public class AdminService : IAdminService
 
     public async Task<List<UserDto>> GetStaffAsync()
     {
-        var users = await _context.Users.AsNoTracking().ToListAsync();
+        var users = await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Role != UserRole.Applicant)
+            .ToListAsync();
+
         return _mapper.Map<List<UserDto>>(users);
     }
 
     public async Task<UserDto> CreateStaffAsync(CreateStaffDto dto)
     {
-        
         if (dto.Role == UserRole.Applicant)
             throw new BusinessRuleException("Cannot create Applicant as staff.");
 
-        var exists = await _context.Users.AnyAsync(x => x.Email == dto.Email);
-        if (exists) throw new BusinessRuleException("Email already exists.");
+        if (await _context.Users.AnyAsync(x => x.Email == dto.Email))
+            throw new BusinessRuleException("Email already exists.");
+
+        if (string.IsNullOrWhiteSpace(dto.FullName))
+            throw new BusinessRuleException("FullName is required for staff.");
+
+        if (string.IsNullOrWhiteSpace(dto.TempPassword))
+            throw new BusinessRuleException("TempPassword is required.");
 
         var user = new UserEntity
         {
             Id = Guid.NewGuid(),
             Email = dto.Email,
-            PasswordHash = PasswordHasher.Hash(dto.Password),
+            FullName = dto.FullName!,
+            PasswordHash = PasswordHasher.Hash(dto.TempPassword),
             Role = dto.Role,
             IsActive = true
         };
 
         _context.Users.Add(user);
-
-        
-        if (dto.Role == UserRole.Manager)
-        {
-            if (string.IsNullOrWhiteSpace(dto.FullName))
-                throw new BusinessRuleException("FullName is required for Manager.");
-
-            _context.Managers.Add(new Manager
-            {
-                Id = Guid.NewGuid(),
-                FullName = dto.FullName!,
-                Email = dto.Email,
-                PasswordHash = user.PasswordHash,
-                Role = "Manager"
-            });
-        }
-
         await _context.SaveChangesAsync();
+
         return _mapper.Map<UserDto>(user);
     }
 
@@ -72,10 +66,13 @@ public class AdminService : IAdminService
         if (user == null) throw new NotFoundException("User not found.");
 
         if (!string.IsNullOrWhiteSpace(dto.Email))
-            user.Email = dto.Email!;
+            user.Email = dto.Email;
+
+        if (!string.IsNullOrWhiteSpace(dto.FullName))
+            user.FullName = dto.FullName;
 
         if (!string.IsNullOrWhiteSpace(dto.Password))
-            user.PasswordHash = PasswordHasher.Hash(dto.Password!);
+            user.PasswordHash = PasswordHasher.Hash(dto.Password);
 
         if (dto.Role.HasValue)
         {
@@ -86,15 +83,6 @@ public class AdminService : IAdminService
 
         if (dto.IsActive.HasValue)
             user.IsActive = dto.IsActive.Value;
-
-        
-        var manager = await _context.Managers.FirstOrDefaultAsync(m => m.Email == user.Email);
-        if (manager != null)
-        {
-            if (!string.IsNullOrWhiteSpace(dto.FullName))
-                manager.FullName = dto.FullName!;
-            manager.PasswordHash = user.PasswordHash;
-        }
 
         await _context.SaveChangesAsync();
         return _mapper.Map<UserDto>(user);

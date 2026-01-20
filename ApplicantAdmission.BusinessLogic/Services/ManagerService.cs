@@ -23,37 +23,51 @@ public class ManagerService : IManagerService
         _mapper = mapper;
     }
 
-    
-    public async Task<List<ManagerDto>> GetAllAsync()
+    private static bool TryParseStatus(string input, out AdmissionStatus status)
     {
-        var managers = await _context.Managers.ToListAsync();
-        return _mapper.Map<List<ManagerDto>>(managers);
+        status = default;
+
+        var normalized = input.Trim().Replace(" ", "");
+        
+        return Enum.TryParse(normalized, ignoreCase: true, out status);
     }
 
-    
+
+    public async Task<List<ManagerDto>> GetAllAsync()
+    {
+        var staff = await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Role == UserRole.Manager || u.Role == UserRole.HeadManager)
+            .ToListAsync();
+
+        return _mapper.Map<List<ManagerDto>>(staff);
+    }
+
+
     public async Task<PagedResult<ApplicantAdmissionDto>> GetApplicationsAsync(
         string? status, int page, int pageSize)
     {
         page = page < 1 ? 1 : page;
         pageSize = pageSize < 1 ? 10 : pageSize;
 
+        
         var query = _context.ApplicantAdmissions
             .Include(x => x.Applicant)
-            .Include(x => x.Manager)
-            .Include(x => x.AdmissionProgram)
-                .ThenInclude(x => x.Program)
+            .Include(x => x.ManagerUser)
+            .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
             .AsQueryable();
+
 
         if (!string.IsNullOrWhiteSpace(status))
         {
-            
-            if (Enum.TryParse<AdmissionStatus>(status, true, out var parsed))
+            if (TryParseStatus(status, out var parsed))
                 query = query.Where(x => x.Status == parsed);
             else if (int.TryParse(status, out var num) && Enum.IsDefined(typeof(AdmissionStatus), num))
                 query = query.Where(x => (int)x.Status == num);
             else
                 throw new BusinessRuleException("Invalid status filter.");
         }
+
 
         var totalCount = await query.CountAsync();
 
@@ -85,87 +99,89 @@ public class ManagerService : IManagerService
         return _mapper.Map<ApplicantDto>(applicant);
     }
 
-    
-    public async Task<ApplicantAdmissionDto> TakeAdmissionAsync(Guid admissionId, Guid managerId)
+
+    public async Task<ApplicantAdmissionDto> TakeAdmissionAsync(Guid admissionId, Guid managerUserId)
     {
         var admission = await _context.ApplicantAdmissions
             .Include(x => x.Applicant)
-            .Include(x => x.Manager)
+            .Include(x => x.ManagerUser)
             .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
             .FirstOrDefaultAsync(x => x.Id == admissionId);
 
         if (admission == null)
             throw new NotFoundException("Admission not found.");
 
-        
-        var managerExists = await _context.Managers.AnyAsync(x => x.Id == managerId);
-        if (!managerExists)
+        var staffExists = await _context.Users.AnyAsync(u =>
+            u.Id == managerUserId && (u.Role == UserRole.Manager || u.Role == UserRole.HeadManager || u.Role == UserRole.Admin));
+
+        if (!staffExists)
             throw new NotFoundException("Manager not found.");
 
-        
-        if (admission.ManagerId != null && admission.ManagerId != managerId)
+        if (admission.ManagerUserId != null && admission.ManagerUserId != managerUserId)
             throw new BusinessRuleException("Admission already owned by another manager.");
 
-        admission.ManagerId = managerId;
+        if (admission.Status == AdmissionStatus.Closed)
+            throw new BusinessRuleException("Cannot take a Closed admission.");
 
-        
-        if (admission.Status == AdmissionStatus.Submitted)
-            admission.Status = AdmissionStatus.InReview;
+        admission.ManagerUserId = managerUserId;
+
+        if (admission.Status == AdmissionStatus.Created)
+            admission.Status = AdmissionStatus.UnderReview;
 
         await _context.SaveChangesAsync();
 
         return _mapper.Map<ApplicantAdmissionDto>(admission);
     }
 
-    
-    public async Task<ApplicantAdmissionDto> ReleaseAdmissionAsync(Guid admissionId, Guid managerId)
+
+
+    public async Task<ApplicantAdmissionDto> ReleaseAdmissionAsync(Guid admissionId, Guid managerUserId)
     {
         var admission = await _context.ApplicantAdmissions
             .Include(x => x.Applicant)
-            .Include(x => x.Manager)
+            .Include(x => x.ManagerUser)
             .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
             .FirstOrDefaultAsync(x => x.Id == admissionId);
 
         if (admission == null)
             throw new NotFoundException("Admission not found.");
 
-        if (admission.ManagerId != managerId)
+        if (admission.Status == AdmissionStatus.Closed)
+            throw new BusinessRuleException("Cannot release a Closed admission.");
+
+        if (admission.ManagerUserId != managerUserId)
             throw new BusinessRuleException("You can only release admissions you own.");
 
-        admission.ManagerId = null;
+        admission.ManagerUserId = null;
 
         await _context.SaveChangesAsync();
 
         return _mapper.Map<ApplicantAdmissionDto>(admission);
     }
 
-    
+
+
     public async Task<ApplicantDto> UpdateApplicantAsync(Guid applicantId, ApplicantUpdateDto dto)
     {
         var applicant = await _context.Applicants
+            .Include(a => a.User)
             .FirstOrDefaultAsync(x => x.Id == applicantId);
 
         if (applicant == null)
             throw new NotFoundException("Applicant not found.");
 
-        
-        if (!string.IsNullOrWhiteSpace(dto.FullName))
-            applicant.FullName = dto.FullName;
-
-        if (!string.IsNullOrWhiteSpace(dto.Phone))
-            applicant.Phone = dto.Phone;
-
         if (!string.IsNullOrWhiteSpace(dto.Citizenship))
             applicant.Citizenship = dto.Citizenship;
 
-        if (dto.DateOfBirth.HasValue)
-            applicant.DateOfBirth = dto.DateOfBirth.Value;
-
         if (!string.IsNullOrWhiteSpace(dto.Gender))
             applicant.Gender = dto.Gender;
+
+        if (dto.DateOfBirth.HasValue)
+            applicant.DateOfBirth = dto.DateOfBirth.Value;
 
         await _context.SaveChangesAsync();
 
         return _mapper.Map<ApplicantDto>(applicant);
     }
+
 }

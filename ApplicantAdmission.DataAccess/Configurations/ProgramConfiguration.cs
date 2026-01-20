@@ -13,15 +13,13 @@ public class ProgramConfiguration : IEntityTypeConfiguration<ProgramEntity>
         builder.Property(x => x.Name).IsRequired();
 
         builder.HasOne(x => x.Faculty)
-            .WithMany(x => x.Programs)
-            .HasForeignKey(x => x.FacultyId);
+            .WithMany(f => f.Programs)
+            .HasForeignKey(x => x.FacultyId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.Level)
-            .WithMany(x => x.Programs)
-            .HasForeignKey(x => x.LevelId);
-
-        builder.HasMany(x => x.AdmissionPrograms)
-            .WithOne(x => x.Program)
-            .HasForeignKey(x => x.ProgramId);
+            .WithMany(l => l.Programs)
+            .HasForeignKey(x => x.LevelId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

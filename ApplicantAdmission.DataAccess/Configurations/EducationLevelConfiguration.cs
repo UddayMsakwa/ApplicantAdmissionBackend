@@ -6,14 +6,9 @@ namespace ApplicantAdmission.DataAccess.Configurations;
 
 public class EducationLevelConfiguration : IEntityTypeConfiguration<EducationLevel>
 {
-    public void Configure(EntityTypeBuilder<EducationLevel> builder)
+    public void Configure(EntityTypeBuilder<EducationLevel> b)
     {
-        builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.Name).IsRequired();
-
-        builder.HasMany(x => x.DocumentTypes)
-            .WithOne(x => x.Level)
-            .HasForeignKey(x => x.LevelId);
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Name).IsRequired();
     }
 }

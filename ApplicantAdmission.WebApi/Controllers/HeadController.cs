@@ -7,7 +7,7 @@ namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
 [Route("api/head")]
-[Authorize(Policy = "HeadOnly")]
+[Authorize(Policy = "HeadAccess")]
 public class HeadController : ControllerBase
 {
     private readonly IHeadService _service;

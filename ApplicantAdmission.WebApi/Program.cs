@@ -79,10 +79,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
-    options.AddPolicy("HeadOnly", p => p.RequireRole("HeadManager"));
-    options.AddPolicy("ManagerOnly", p => p.RequireRole("Manager"));
+    options.AddPolicy("HeadAccess", p => p.RequireRole("HeadManager", "Admin"));
+    options.AddPolicy("ManagerAccess", p => p.RequireRole("Manager", "HeadManager", "Admin"));
     options.AddPolicy("ApplicantOnly", p => p.RequireRole("Applicant"));
 });
+
 
 
 builder.Services.AddEndpointsApiExplorer();

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ApplicantAdmission.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicantDbContext))]
-    [Migration("20260110151135_FinalFix")]
-    partial class FinalFix
+    [Migration("20260120145806_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,13 +39,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasIndex("ProgramId");
 
                     b.ToTable("AdmissionPrograms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
-                            ProgramId = new Guid("33333333-3333-3333-3333-333333333333")
-                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Applicant", b =>
@@ -66,10 +59,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -106,7 +95,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ManagerId")
+                    b.Property<Guid?>("ManagerUserId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Status")
@@ -118,7 +107,7 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
                     b.HasIndex("ApplicantId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("ManagerUserId");
 
                     b.ToTable("ApplicantAdmissions");
                 });
@@ -156,44 +145,42 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("LevelId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("LevelId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("NextLevelId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LevelId");
 
+                    b.ToTable("EducationDocumentTypes");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentTypeNextLevel", b =>
+                {
+                    b.Property<Guid>("DocumentTypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("NextLevelId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DocumentTypeId", "NextLevelId");
+
                     b.HasIndex("NextLevelId");
 
-                    b.ToTable("EducationDocumentTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Diploma"
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Transcript"
-                        });
+                    b.ToTable("EducationDocumentTypeNextLevels");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationLevel", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -202,13 +189,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EducationLevels");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Bachelor"
-                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Faculty", b =>
@@ -224,13 +204,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Faculties");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "Engineering"
-                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.FileEntity", b =>
@@ -259,41 +232,40 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.ToTable("FileEntity");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Manager", b =>
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.NotificationEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FullName")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Subject")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("ToEmail")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Managers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
-                            Email = "manager@test.com",
-                            FullName = "Admin Manager",
-                            PasswordHash = "YbOtJDNsIFFVc9x9h1y5KV6EYs7GRcNgSsWPHiQeIOA=",
-                            Role = "Admin"
-                        });
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>
@@ -305,8 +277,8 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("LevelId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("LevelId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -319,15 +291,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasIndex("LevelId");
 
                     b.ToTable("Programs");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            FacultyId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            LevelId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Computer Science"
-                        });
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.UserEntity", b =>
@@ -337,6 +300,10 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -360,10 +327,29 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
-                            Email = "head@admin.com",
+                            Id = new Guid("aaaaaaaa-0000-0000-0000-000000000001"),
+                            Email = "admin@test.local",
+                            FullName = "Seeded Admin",
                             IsActive = true,
-                            PasswordHash = "Admin123",
+                            PasswordHash = "AAAAAAAAAAAAAAAAAAAAAA==.EnhHDOCZohHrqGP85zO7Zipwzs4q0OhgUwZQysGSz78=",
+                            Role = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-0000-0000-0000-000000000002"),
+                            Email = "mgr1@test.local",
+                            FullName = "Seeded Manager 1",
+                            IsActive = true,
+                            PasswordHash = "AQEBAQEBAQEBAQEBAQEBAQ==.T2OFoGXsyB+4m6EU8Cqe+ZayYvxhQGGdxiuZvxXDUYY=",
+                            Role = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-0000-0000-0000-000000000003"),
+                            Email = "head1@test.local",
+                            FullName = "Seeded Head 1",
+                            IsActive = true,
+                            PasswordHash = "AgICAgICAgICAgICAgICAg==.J+1k/wkwqW+NmBShThK3HzP0VTbZ9il8VemNnUxuy94=",
                             Role = 1
                         });
                 });
@@ -444,15 +430,16 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApplicantAdmission.DataAccess.Entities.Manager", "Manager")
-                        .WithMany("ApplicantAdmissions")
-                        .HasForeignKey("ManagerId");
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.UserEntity", "ManagerUser")
+                        .WithMany()
+                        .HasForeignKey("ManagerUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("AdmissionProgram");
 
                     b.Navigation("Applicant");
 
-                    b.Navigation("Manager");
+                    b.Navigation("ManagerUser");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Document", b =>
@@ -479,15 +466,27 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.EducationLevel", "Level")
                         .WithMany("DocumentTypes")
                         .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Level");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentTypeNextLevel", b =>
+                {
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.EducationDocumentType", "DocumentType")
+                        .WithMany("NextLevels")
+                        .HasForeignKey("DocumentTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.EducationLevel", "NextLevel")
                         .WithMany()
                         .HasForeignKey("NextLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Level");
+                    b.Navigation("DocumentType");
 
                     b.Navigation("NextLevel");
                 });
@@ -547,6 +546,11 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.Navigation("Documents");
                 });
 
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentType", b =>
+                {
+                    b.Navigation("NextLevels");
+                });
+
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationLevel", b =>
                 {
                     b.Navigation("DocumentTypes");
@@ -562,11 +566,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.FileEntity", b =>
                 {
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Manager", b =>
-                {
-                    b.Navigation("ApplicantAdmissions");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>

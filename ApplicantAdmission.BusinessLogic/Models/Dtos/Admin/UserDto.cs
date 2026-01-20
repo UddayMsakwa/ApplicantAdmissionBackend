@@ -8,4 +8,5 @@ public class UserDto
     public string Email { get; set; } = null!;
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
+    public string FullName { get; set; } = "";
 }

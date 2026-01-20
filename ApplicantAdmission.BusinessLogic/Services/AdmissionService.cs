@@ -25,7 +25,7 @@ namespace ApplicantAdmission.BusinessLogic.Services
         {
             return await _context.ApplicantAdmissions
                 .Include(x => x.Applicant)
-                .Include(x => x.Manager)
+                .Include(x => x.ManagerUser)
                 .Include(x => x.AdmissionProgram)
                     .ThenInclude(x => x.Program)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -42,16 +42,16 @@ namespace ApplicantAdmission.BusinessLogic.Services
             var list = await _context.ApplicantAdmissions
                 .Where(x => x.ApplicantId == applicantId)
                 .Include(x => x.AdmissionProgram)
-                .Include(x => x.Manager)
+                .Include(x => x.ManagerUser)
                 .ToListAsync();
 
             return _mapper.Map<List<ApplicantAdmissionDto>>(list);
         }
 
-        public async Task<List<ApplicantAdmissionDto>> GetByManagerAsync(Guid managerId)
+        public async Task<List<ApplicantAdmissionDto>> GetByManagerAsync(Guid managerUserId)
         {
             var list = await _context.ApplicantAdmissions
-                .Where(x => x.ManagerId == managerId)
+                .Where(x => x.ManagerUserId == managerUserId)
                 .Include(x => x.Applicant)
                 .Include(x => x.AdmissionProgram)
                 .ToListAsync();
@@ -63,7 +63,7 @@ namespace ApplicantAdmission.BusinessLogic.Services
         {
             var list = await _context.ApplicantAdmissions
                 .Include(x => x.Applicant)
-                .Include(x => x.Manager)
+                .Include(x => x.ManagerUser)
                 .Include(x => x.AdmissionProgram)
                 .ToListAsync();
 
@@ -77,7 +77,7 @@ namespace ApplicantAdmission.BusinessLogic.Services
 
             var query = _context.ApplicantAdmissions
                 .Include(x => x.Applicant)
-                .Include(x => x.Manager)
+                .Include(x => x.ManagerUser)
                 .Include(x => x.AdmissionProgram);
 
             var totalCount = await query.CountAsync();
@@ -102,7 +102,7 @@ namespace ApplicantAdmission.BusinessLogic.Services
             var entity = _mapper.Map<ApplicantAdmissionEntity>(dto);
 
             entity.Id = Guid.NewGuid();
-            entity.Status = AdmissionStatus.Submitted;
+            entity.Status = AdmissionStatus.Created; 
             entity.CreatedAt = DateTime.UtcNow;
 
             _context.ApplicantAdmissions.Add(entity);
@@ -111,34 +111,47 @@ namespace ApplicantAdmission.BusinessLogic.Services
             return _mapper.Map<ApplicantAdmissionDto>(entity);
         }
 
-        public async Task<ApplicantAdmissionDto> AssignManagerAsync(Guid admissionId, Guid managerId)
+
+        public async Task<ApplicantAdmissionDto> AssignManagerAsync(Guid admissionId, Guid managerUserId)
         {
             var entity = await _context.ApplicantAdmissions.FindAsync(admissionId)
                 ?? throw new NotFoundException("Admission not found.");
 
-            if (!await _context.Managers.AnyAsync(x => x.Id == managerId))
+            var staffExists = await _context.Users.AnyAsync(u =>
+                u.Id == managerUserId &&
+                (u.Role == UserRole.Manager || u.Role == UserRole.HeadManager || u.Role == UserRole.Admin));
+
+            if (!staffExists)
                 throw new NotFoundException("Manager not found.");
 
-            
-            if (entity.ManagerId != null)
-                throw new NotFoundException("Manager already assigned"); 
+            if (entity.ManagerUserId != null)
+                throw new BusinessRuleException("Manager already assigned.");
 
-            entity.ManagerId = managerId;
+            entity.ManagerUserId = managerUserId;
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<ApplicantAdmissionDto>(entity);
+            var full = await LoadFullAdmission(entity.Id)
+                ?? throw new NotFoundException("Admission not found.");
+
+            return _mapper.Map<ApplicantAdmissionDto>(full);
         }
+
+
 
         public async Task<ApplicantAdmissionDto> UpdateStatusAsync(Guid admissionId, AdmissionStatus status)
         {
             var entity = await _context.ApplicantAdmissions.FindAsync(admissionId)
                 ?? throw new NotFoundException("Admission not found.");
 
-           
-            if (entity.Status == AdmissionStatus.Accepted ||
-                entity.Status == AdmissionStatus.Rejected)
+            
+            if (entity.Status == AdmissionStatus.Closed)
+                throw new BusinessRuleException("Admission is Closed and cannot be changed.");
+
+            
+            if ((entity.Status == AdmissionStatus.Confirmed || entity.Status == AdmissionStatus.Rejected)
+                && status != AdmissionStatus.Closed)
             {
-                throw new NotFoundException("Final status cannot be changed"); 
+                throw new BusinessRuleException("Only transition allowed from Confirmed/Rejected is to Closed.");
             }
 
             entity.Status = status;
@@ -146,5 +159,6 @@ namespace ApplicantAdmission.BusinessLogic.Services
 
             return _mapper.Map<ApplicantAdmissionDto>(entity);
         }
+        
     }
 }

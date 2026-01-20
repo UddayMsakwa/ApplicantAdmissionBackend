@@ -13,8 +13,9 @@ public class ApplicantAdmissionEntity
     public Guid AdmissionProgramId { get; set; }
     public AdmissionProgram AdmissionProgram { get; set; } = null!;
 
-    public Guid? ManagerId { get; set; }
-    public Manager? Manager { get; set; }
+    public Guid? ManagerUserId { get; set; }
+    public UserEntity? ManagerUser { get; set; }
+
 
     public AdmissionStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }

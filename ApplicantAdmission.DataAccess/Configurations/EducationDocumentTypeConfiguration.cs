@@ -6,20 +6,14 @@ namespace ApplicantAdmission.DataAccess.Configurations;
 
 public class EducationDocumentTypeConfiguration : IEntityTypeConfiguration<EducationDocumentType>
 {
-    public void Configure(EntityTypeBuilder<EducationDocumentType> builder)
+    public void Configure(EntityTypeBuilder<EducationDocumentType> b)
     {
-        builder.HasKey(x => x.Id);
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Name).IsRequired();
 
-        builder.Property(x => x.Name).IsRequired();
-
-        builder.HasOne(x => x.Level)
-            .WithMany(x => x.DocumentTypes)
+        b.HasOne(x => x.Level)
+            .WithMany(l => l.DocumentTypes)
             .HasForeignKey(x => x.LevelId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(x => x.NextLevel)
-            .WithMany()
-            .HasForeignKey(x => x.NextLevelId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

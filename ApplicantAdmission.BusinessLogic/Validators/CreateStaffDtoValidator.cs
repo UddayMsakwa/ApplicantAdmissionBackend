@@ -9,7 +9,7 @@ public class CreateStaffDtoValidator : AbstractValidator<CreateStaffDto>
     public CreateStaffDtoValidator()
     {
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
-        RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
+        RuleFor(x => x.TempPassword).NotEmpty().MinimumLength(6);
 
         RuleFor(x => x.Role)
             .IsInEnum()

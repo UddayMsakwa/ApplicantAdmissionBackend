@@ -16,8 +16,24 @@ builder.Services.AddDbContext<ApplicantDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
+builder.Services.AddHttpClient("DictionaryApi", client =>
+{
+    var baseUrl = builder.Configuration["DictionaryApi:BaseUrl"];
+    if (string.IsNullOrWhiteSpace(baseUrl))
+        throw new InvalidOperationException("DictionaryApi:BaseUrl is missing in Jobs appsettings.json");
+
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+
 builder.Services.AddQuartz(q =>
 {
+    q.UseMicrosoftDependencyInjectionJobFactory();
+
+    var dictMinutes = builder.Configuration.GetValue<int>("Jobs:DictionarySyncIntervalMinutes", 30);
+    var notifSeconds = builder.Configuration.GetValue<int>("Jobs:NotificationSenderIntervalSeconds", 30);
+
     
     var dictJobKey = new JobKey("DictionarySyncJob");
     q.AddJob<DictionarySyncJob>(opts => opts.WithIdentity(dictJobKey));
@@ -25,7 +41,7 @@ builder.Services.AddQuartz(q =>
         .ForJob(dictJobKey)
         .WithIdentity("DictionarySyncJob-trigger")
         .StartNow()
-        .WithSimpleSchedule(x => x.WithIntervalInMinutes(30).RepeatForever()));
+        .WithSimpleSchedule(x => x.WithIntervalInMinutes(dictMinutes).RepeatForever()));
 
     
     var notifJobKey = new JobKey("NotificationSenderJob");
@@ -34,24 +50,10 @@ builder.Services.AddQuartz(q =>
         .ForJob(notifJobKey)
         .WithIdentity("NotificationSenderJob-trigger")
         .StartNow()
-        .WithSimpleSchedule(x =>
-            x.WithIntervalInSeconds(
-                    builder.Configuration.GetValue<int>("Jobs:NotificationSenderIntervalSeconds", 30))
-                .RepeatForever()));
+        .WithSimpleSchedule(x => x.WithIntervalInSeconds(notifSeconds).RepeatForever()));
 });
 
-builder.Services.AddQuartzHostedService(options =>
-{
-    options.WaitForJobsToComplete = true;
-});
-
-
-builder.Services.AddHttpClient("DictionaryApi", client =>
-{
-    var baseUrl = builder.Configuration["DictionaryApi:BaseUrl"];
-    if (!string.IsNullOrWhiteSpace(baseUrl))
-        client.BaseAddress = new Uri(baseUrl);
-});
+builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
 var host = builder.Build();
-host.Run();
+await host.RunAsync();

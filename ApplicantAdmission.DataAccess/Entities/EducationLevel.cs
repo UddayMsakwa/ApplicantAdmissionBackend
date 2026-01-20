@@ -2,10 +2,11 @@
 
 public class EducationLevel
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
+    
+    public int Id { get; set; }
+
+    public string Name { get; set; } = "";
 
     public ICollection<EducationDocumentType> DocumentTypes { get; set; } = new List<EducationDocumentType>();
     public ICollection<ProgramEntity> Programs { get; set; } = new List<ProgramEntity>();
-
 }

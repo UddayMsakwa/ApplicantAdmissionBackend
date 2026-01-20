@@ -7,4 +7,6 @@ public interface IAuthService
 {
     Task<AuthResponseDto> RegisterApplicantAsync(AuthRegisterDto dto);
     Task<AuthResponseDto> LoginAsync(AuthLoginDto dto);
+    Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto);
+
 }

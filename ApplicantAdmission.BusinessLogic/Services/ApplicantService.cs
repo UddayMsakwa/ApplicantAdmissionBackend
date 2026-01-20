@@ -1,8 +1,7 @@
-﻿using ApplicantAdmission.BusinessLogic.Interfaces;
+﻿using ApplicantAdmission.BusinessLogic.Exceptions;
+using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
 using ApplicantAdmission.DataAccess;
-using ApplicantAdmission.DataAccess.Entities;
-using ApplicantAdmission.DataAccess.Enums;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,77 +11,67 @@ public class ApplicantService : IApplicantService
 {
     private readonly ApplicantDbContext _context;
     private readonly IMapper _mapper;
-    private readonly INotificationService _notification;
 
-    public ApplicantService(
-        ApplicantDbContext context,
-        IMapper mapper,
-        INotificationService notification)
+    public ApplicantService(ApplicantDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
-        _notification = notification;
     }
 
     public async Task<ApplicantDto?> GetByIdAsync(Guid id)
     {
-        var entity = await _context.Applicants.FindAsync(id);
+        var entity = await _context.Applicants
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         return entity == null ? null : _mapper.Map<ApplicantDto>(entity);
     }
 
     public async Task<List<ApplicantDto>> GetAllAsync()
     {
-        var list = await _context.Applicants.ToListAsync();
+        var list = await _context.Applicants
+            .Include(a => a.User)
+            .ToListAsync();
+
         return _mapper.Map<List<ApplicantDto>>(list);
     }
 
-    public async Task<ApplicantDto> CreateAsync(ApplicantCreateDto dto)
-    {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Email = dto.Email,
-            PasswordHash = PasswordHasher.Hash(dto.Password),
-            Role = UserRole.Applicant,
-            IsActive = true
-        };
-
-        _context.Users.Add(user);
-
-        public async Task<ApplicantDto> UpdateAsync(Guid id, ApplicantUpdateDto dto)
+    public async Task<ApplicantDto> GetMeAsync(Guid userId)
     {
         var applicant = await _context.Applicants
-            .Include(a => a.Admissions)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.UserId == userId);
 
-        if (applicant == null)
-            throw new Exception("Applicant not found");
-
-        if (applicant.Admissions.Any(a => a.Status == AdmissionStatus.Closed))
-            throw new InvalidOperationException("Cannot modify applicant with closed admission");
-
-        _mapper.Map(dto, applicant);
-        await _context.SaveChangesAsync();
-
+        if (applicant == null) throw new NotFoundException("Applicant profile not found.");
         return _mapper.Map<ApplicantDto>(applicant);
     }
 
-    var applicant = new Applicant
-        {
-            Id = Guid.NewGuid(),
-            UserId = user.Id,
-            FullName = dto.FullName,
-            Phone = dto.Phone,
-            DateOfBirth = dto.DateOfBirth,
-            Gender = dto.Gender,
-            Citizenship = dto.Citizenship
-        };
+    public async Task<ApplicantDto> UpdateMeAsync(Guid userId, ApplicantUpdateDto dto)
+    {
+        var applicant = await _context.Applicants
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.UserId == userId);
 
-        _context.Applicants.Add(applicant);
+        if (applicant == null) throw new NotFoundException("Applicant profile not found.");
+
+        
+        if (!string.IsNullOrWhiteSpace(dto.FullName))
+            applicant.User.FullName = dto.FullName;
+
+        
+        if (!string.IsNullOrWhiteSpace(dto.Phone))
+            applicant.Phone = dto.Phone;
+
+        if (dto.DateOfBirth.HasValue)
+            applicant.DateOfBirth = dto.DateOfBirth.Value;
+
+        if (dto.Gender != null)
+            applicant.Gender = dto.Gender;
+
+        if (dto.Citizenship != null)
+            applicant.Citizenship = dto.Citizenship;
+
         await _context.SaveChangesAsync();
-
-        await _notification.NotifyApplicantAsync(applicant.Id, "Registration successful");
-
         return _mapper.Map<ApplicantDto>(applicant);
     }
 }
