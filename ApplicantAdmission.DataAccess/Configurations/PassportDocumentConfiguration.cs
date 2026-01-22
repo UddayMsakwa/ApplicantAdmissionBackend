@@ -8,9 +8,11 @@ public class PassportDocumentConfiguration : IEntityTypeConfiguration<PassportDo
 {
     public void Configure(EntityTypeBuilder<PassportDocument> builder)
     {
+        builder.Property(x => x.Series).IsRequired();
         builder.Property(x => x.Number).IsRequired();
-        builder.Property(x => x.Country).IsRequired();
+        builder.Property(x => x.IssuedBy).IsRequired();
         builder.Property(x => x.IssueDate).IsRequired();
+        builder.Property(x => x.BirthPlace).IsRequired();
 
         builder.ToTable("PassportDocuments");
     }

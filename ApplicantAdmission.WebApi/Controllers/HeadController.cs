@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/head")]
+[Route("head")]
 [Authorize(Policy = "HeadAccess")]
 public class HeadController : ControllerBase
 {

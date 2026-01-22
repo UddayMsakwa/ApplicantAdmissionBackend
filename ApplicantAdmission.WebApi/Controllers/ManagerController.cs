@@ -1,13 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
+using ApplicantAdmission.BusinessLogic.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/manager")]
+[Route("manager")]
 [Authorize(Policy = "ManagerAccess")]
 public class ManagerController : ControllerBase
 {
@@ -18,21 +20,47 @@ public class ManagerController : ControllerBase
         _service = service;
     }
 
-    private IActionResult? TryGetUserId(out Guid userId)
+    private Guid GetUserIdOrThrow()
     {
-        userId = default;
+        var idStr =
+            User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            User.FindFirst("userId")?.Value;
 
-        var sub = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-        if (string.IsNullOrWhiteSpace(sub)) return Unauthorized("Missing token subject (sub).");
+        if (!Guid.TryParse(idStr, out var userId))
+            throw new UnauthorizedException("Invalid token: user id missing.");
 
-        if (!Guid.TryParse(sub, out userId)) return Unauthorized("Invalid token subject (sub).");
-
-        return null;
+        return userId;
     }
 
     [HttpGet("applications")]
-    public async Task<IActionResult> GetApplications([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-        => Ok(await _service.GetApplicationsAsync(status, page, pageSize));
+    public async Task<IActionResult> GetApplications(
+        [FromQuery] string? search,
+        [FromQuery] Guid? programId,
+        [FromQuery] string? facultyIds,
+        [FromQuery] string? status,
+        [FromQuery] bool? unassignedOnly,
+        [FromQuery] bool? assignedToMe,
+        [FromQuery] string? sort,
+        [FromQuery] string? order,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var managerUserId = GetUserIdOrThrow();
+
+        return Ok(await _service.GetApplicationsAdvancedAsync(
+            managerUserId,
+            search,
+            programId,
+            facultyIds,
+            status,
+            unassignedOnly,
+            assignedToMe,
+            sort,
+            order,
+            page,
+            pageSize));
+    }
 
     [HttpGet("applicants/{id:guid}")]
     public async Task<IActionResult> GetApplicant(Guid id)
@@ -41,18 +69,14 @@ public class ManagerController : ControllerBase
     [HttpPost("admissions/{id:guid}/take")]
     public async Task<IActionResult> Take(Guid id)
     {
-        var bad = TryGetUserId(out var managerUserId);
-        if (bad != null) return bad;
-
+        var managerUserId = GetUserIdOrThrow();
         return Ok(await _service.TakeAdmissionAsync(id, managerUserId));
     }
 
     [HttpPost("admissions/{id:guid}/release")]
     public async Task<IActionResult> Release(Guid id)
     {
-        var bad = TryGetUserId(out var managerUserId);
-        if (bad != null) return bad;
-
+        var managerUserId = GetUserIdOrThrow();
         return Ok(await _service.ReleaseAdmissionAsync(id, managerUserId));
     }
 

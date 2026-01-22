@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/education-document-types")]
+[Route("education-document-types")]
 public class EducationDocumentTypeController : ControllerBase
 {
     private readonly IEducationDocumentTypeService _service;

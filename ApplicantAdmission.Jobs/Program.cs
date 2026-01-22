@@ -1,59 +1,66 @@
+using System.Net.Http.Headers;
+using System.Text;
 using ApplicantAdmission.DataAccess;
+using ApplicantAdmission.Jobs.Jobs;
 using Microsoft.EntityFrameworkCore;
-using NLog;
-using NLog.Extensions.Logging;
 using Quartz;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 
-LogManager.Setup().LoadConfigurationFromFile("nlog.config", optional: true);
-builder.Logging.ClearProviders();
-builder.Logging.AddNLog();
+builder.Services.AddDbContext<ApplicantDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddDbContext<ApplicantDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 
-builder.Services.AddHttpClient("DictionaryApi", client =>
+builder.Services.AddHttpClient("DictionaryApi", (sp, client) =>
 {
-    var baseUrl = builder.Configuration["DictionaryApi:BaseUrl"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-        throw new InvalidOperationException("DictionaryApi:BaseUrl is missing in Jobs appsettings.json");
+    var cfg = sp.GetRequiredService<IConfiguration>();
 
-    client.BaseAddress = new Uri(baseUrl);
-    client.Timeout = TimeSpan.FromSeconds(30);
+    var baseUrl = cfg["DictionaryApi:BaseUrl"];
+    var user = cfg["DictionaryApi:Username"];
+    var pass = cfg["DictionaryApi:Password"];
+
+    if (string.IsNullOrWhiteSpace(baseUrl))
+        throw new InvalidOperationException("DictionaryApi:BaseUrl is missing.");
+
+    client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/");
+
+    if (!string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pass))
+    {
+        var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{pass}"));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token);
+    }
 });
 
 
 builder.Services.AddQuartz(q =>
 {
+    
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    var dictMinutes = builder.Configuration.GetValue<int>("Jobs:DictionarySyncIntervalMinutes", 30);
-    var notifSeconds = builder.Configuration.GetValue<int>("Jobs:NotificationSenderIntervalSeconds", 30);
-
-    
-    var dictJobKey = new JobKey("DictionarySyncJob");
-    q.AddJob<DictionarySyncJob>(opts => opts.WithIdentity(dictJobKey));
-    q.AddTrigger(opts => opts
-        .ForJob(dictJobKey)
-        .WithIdentity("DictionarySyncJob-trigger")
+    q.ScheduleJob<DictionarySyncJob>(trigger => trigger
+        .WithIdentity("DictionarySyncTrigger")
         .StartNow()
-        .WithSimpleSchedule(x => x.WithIntervalInMinutes(dictMinutes).RepeatForever()));
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(builder.Configuration.GetValue<int>("Jobs:DictionarySyncIntervalMinutes"))
+            .RepeatForever()
+        )
+    );
 
-    
-    var notifJobKey = new JobKey("NotificationSenderJob");
-    q.AddJob<NotificationSenderJob>(opts => opts.WithIdentity(notifJobKey));
-    q.AddTrigger(opts => opts
-        .ForJob(notifJobKey)
-        .WithIdentity("NotificationSenderJob-trigger")
+    q.ScheduleJob<NotificationSenderJob>(trigger => trigger
+        .WithIdentity("NotificationSenderTrigger")
         .StartNow()
-        .WithSimpleSchedule(x => x.WithIntervalInSeconds(notifSeconds).RepeatForever()));
+        .WithSimpleSchedule(x => x
+            .WithIntervalInSeconds(builder.Configuration.GetValue<int>("Jobs:NotificationSenderIntervalSeconds"))
+            .RepeatForever()
+        )
+    );
 });
 
 builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
 var host = builder.Build();
-await host.RunAsync();
+host.Run();

@@ -2,15 +2,14 @@
 
 namespace ApplicantAdmission.DataAccess.Entities;
 
-public class Document
+public abstract class Document
 {
     public Guid Id { get; set; }
 
     public Guid ApplicantId { get; set; }
     public Applicant Applicant { get; set; } = null!;
 
-    public Guid FileId { get; set; }
-    public FileEntity File { get; set; } = null!;
-
     public string DocumentKind { get; set; } = null!;
+
+    public ICollection<DocumentScan> Scans { get; set; } = new List<DocumentScan>();
 }

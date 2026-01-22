@@ -12,6 +12,20 @@ public interface IManagerService
     Task<PagedResult<ApplicantAdmissionDto>> GetApplicationsAsync(
         string? status, int page, int pageSize);
 
+    
+    Task<PagedResult<ApplicantAdmissionDto>> GetApplicationsAdvancedAsync(
+        Guid currentManagerUserId,
+        string? search,
+        Guid? programId,
+        string? facultyIds,
+        string? status,
+        bool? unassignedOnly,
+        bool? assignedToMe,
+        string? sort,
+        string? order,
+        int page,
+        int pageSize);
+
     Task<ApplicantDto> GetApplicantAsync(Guid applicantId);
 
     Task<ApplicantAdmissionDto> TakeAdmissionAsync(Guid admissionId, Guid managerId);

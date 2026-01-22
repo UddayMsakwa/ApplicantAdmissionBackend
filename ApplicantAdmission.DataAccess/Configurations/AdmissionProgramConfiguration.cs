@@ -8,10 +8,21 @@ public class AdmissionProgramConfiguration : IEntityTypeConfiguration<AdmissionP
 {
     public void Configure(EntityTypeBuilder<AdmissionProgram> builder)
     {
+        builder.ToTable("AdmissionPrograms");
+
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Priority).IsRequired();
+
         builder.HasOne(x => x.Program)
-            .WithMany(x => x.AdmissionPrograms)
-            .HasForeignKey(x => x.ProgramId);
+            .WithMany(p => p.AdmissionPrograms)
+            .HasForeignKey(x => x.ProgramId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => new { x.ApplicantAdmissionId, x.ProgramId })
+            .IsUnique();
+
+        builder.HasIndex(x => new { x.ApplicantAdmissionId, x.Priority })
+            .IsUnique();
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/faculties")]
+[Route("faculties")]
 public class FacultyController : ControllerBase
 {
     private readonly IFacultyService _service;

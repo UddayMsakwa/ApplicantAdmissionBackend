@@ -15,7 +15,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NLog.Web;
 
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -32,10 +31,13 @@ builder.Services.AddScoped<IEducationDocumentTypeService, EducationDocumentTypeS
 builder.Services.AddScoped<IProgramService, ProgramService>();
 builder.Services.AddScoped<IFacultyService, FacultyService>();
 
+builder.Services.AddScoped<IAdmissionLockService, AdmissionLockService>();
+builder.Services.AddScoped<ISelectedProgramsService, SelectedProgramsService>();
+
+
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IAdmissionService, AdmissionService>();
-builder.Services.AddScoped<IDocumentService, DocumentService>();
-builder.Services.AddScoped<IEducationDocumentService, EducationDocumentService>();
+builder.Services.AddScoped<IApplicantDocumentsService, ApplicantDocumentsService>();
 
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IHeadService, HeadService>();
@@ -56,9 +58,21 @@ builder.Services.AddControllers()
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 
-builder.Services.AddHealthChecks()
-    .AddCheck("db", () => HealthCheckResult.Healthy());
+var cs = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
+builder.Services.AddHealthChecks()
+    .AddNpgSql(cs, name: "postgres");
+
+
+builder.Services.AddHttpClient<FilesApiClient>(client =>
+{
+    var baseUrl = builder.Configuration["Services:FilesApiBaseUrl"];
+    if (string.IsNullOrWhiteSpace(baseUrl))
+        baseUrl = "http://localhost:5221/"; 
+    client.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : baseUrl + "/");
+});
+
+builder.Services.AddScoped<IApplicantDocumentsService, ApplicantDocumentsService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

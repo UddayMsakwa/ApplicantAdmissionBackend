@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/admin")]
+[Route("admin")]
 [Authorize(Policy = "AdminOnly")]
 public class AdminController : ControllerBase
 {

@@ -5,7 +5,7 @@ using ApplicantAdmission.BusinessLogic.Models.Dtos.Auth;
 namespace ApplicantAdmission.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -19,6 +19,7 @@ namespace ApplicantAdmission.WebApi.Controllers
         public async Task<IActionResult> Register([FromBody] AuthRegisterDto dto)
         {
             var result = await _authService.RegisterApplicantAsync(dto);
+            
             return Ok(result);
         }
 

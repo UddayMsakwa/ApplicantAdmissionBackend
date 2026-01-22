@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ApplicantAdmission.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicantDbContext))]
-    [Migration("20260120145806_Initial")]
+    [Migration("20260122140439_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -31,6 +31,12 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ApplicantAdmissionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("ProgramId")
                         .HasColumnType("uuid");
 
@@ -38,7 +44,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
                     b.HasIndex("ProgramId");
 
-                    b.ToTable("AdmissionPrograms");
+                    b.HasIndex("ApplicantAdmissionId", "Priority")
+                        .IsUnique();
+
+                    b.HasIndex("ApplicantAdmissionId", "ProgramId")
+                        .IsUnique();
+
+                    b.ToTable("AdmissionPrograms", (string)null);
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Applicant", b =>
@@ -48,36 +60,30 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Citizenship")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("date");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("Gender")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-                    b.ToTable("Applicants");
+                    b.ToTable("Applicants", (string)null);
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
@@ -86,13 +92,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AdmissionProgramId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ApplicantId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("ManagerUserId")
@@ -103,13 +109,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdmissionProgramId");
-
                     b.HasIndex("ApplicantId");
+
+                    b.HasIndex("LastModifiedAt");
 
                     b.HasIndex("ManagerUserId");
 
-                    b.ToTable("ApplicantAdmissions");
+                    b.ToTable("ApplicantAdmissions", (string)null);
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Document", b =>
@@ -125,18 +131,49 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("FileId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicantId");
 
-                    b.HasIndex("FileId");
-
                     b.ToTable("Documents", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.DocumentScan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("FileId")
+                        .IsUnique();
+
+                    b.ToTable("DocumentScans", (string)null);
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentType", b =>
@@ -206,32 +243,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                     b.ToTable("Faculties");
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.FileEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FileEntity");
-                });
-
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.NotificationEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -274,8 +285,16 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("LevelId")
                         .HasColumnType("integer");
@@ -284,11 +303,21 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("StudyForm")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Code");
 
                     b.HasIndex("FacultyId");
 
+                    b.HasIndex("Language");
+
                     b.HasIndex("LevelId");
+
+                    b.HasIndex("StudyForm");
 
                     b.ToTable("Programs");
                 });
@@ -358,16 +387,13 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 {
                     b.HasBaseType("ApplicantAdmission.DataAccess.Entities.Document");
 
-                    b.Property<decimal>("AverageScore")
-                        .HasColumnType("numeric(5,2)");
-
                     b.Property<Guid>("DocumentTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("GraduationYear")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("InstitutionName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -380,14 +406,22 @@ namespace ApplicantAdmission.DataAccess.Migrations
                 {
                     b.HasBaseType("ApplicantAdmission.DataAccess.Entities.Document");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("BirthPlace")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("IssuedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Series")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -396,11 +430,19 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.AdmissionProgram", b =>
                 {
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", "ApplicantAdmission")
+                        .WithMany("AdmissionPrograms")
+                        .HasForeignKey("ApplicantAdmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.ProgramEntity", "Program")
                         .WithMany("AdmissionPrograms")
                         .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ApplicantAdmission");
 
                     b.Navigation("Program");
                 });
@@ -418,12 +460,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
                 {
-                    b.HasOne("ApplicantAdmission.DataAccess.Entities.AdmissionProgram", "AdmissionProgram")
-                        .WithMany("ApplicantAdmissions")
-                        .HasForeignKey("AdmissionProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ApplicantAdmission.DataAccess.Entities.Applicant", "Applicant")
                         .WithMany("Admissions")
                         .HasForeignKey("ApplicantId")
@@ -434,8 +470,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("ManagerUserId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("AdmissionProgram");
 
                     b.Navigation("Applicant");
 
@@ -450,15 +484,18 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApplicantAdmission.DataAccess.Entities.FileEntity", "File")
-                        .WithMany("Documents")
-                        .HasForeignKey("FileId")
+                    b.Navigation("Applicant");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.DocumentScan", b =>
+                {
+                    b.HasOne("ApplicantAdmission.DataAccess.Entities.Document", "Document")
+                        .WithMany("Scans")
+                        .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Applicant");
-
-                    b.Navigation("File");
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentType", b =>
@@ -534,16 +571,21 @@ namespace ApplicantAdmission.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.AdmissionProgram", b =>
-                {
-                    b.Navigation("ApplicantAdmissions");
-                });
-
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Applicant", b =>
                 {
                     b.Navigation("Admissions");
 
                     b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ApplicantAdmissionEntity", b =>
+                {
+                    b.Navigation("AdmissionPrograms");
+                });
+
+            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Document", b =>
+                {
+                    b.Navigation("Scans");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.EducationDocumentType", b =>
@@ -561,11 +603,6 @@ namespace ApplicantAdmission.DataAccess.Migrations
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.Faculty", b =>
                 {
                     b.Navigation("Programs");
-                });
-
-            modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.FileEntity", b =>
-                {
-                    b.Navigation("Documents");
                 });
 
             modelBuilder.Entity("ApplicantAdmission.DataAccess.Entities.ProgramEntity", b =>

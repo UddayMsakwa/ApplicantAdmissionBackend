@@ -14,6 +14,9 @@ public class ApplicantConfiguration : IEntityTypeConfiguration<Applicant>
 
         builder.Property(x => x.Phone).IsRequired().HasMaxLength(30);
 
+        builder.Property(x => x.DateOfBirth)
+    .HasColumnType("date");
+
         builder.Property(x => x.Gender).HasMaxLength(50);
         builder.Property(x => x.Citizenship).HasMaxLength(100);
 

@@ -8,13 +8,8 @@ public class EducationDocumentConfiguration : IEntityTypeConfiguration<Education
 {
     public void Configure(EntityTypeBuilder<EducationDocument> builder)
     {
-        
-        builder.Property(x => x.InstitutionName).IsRequired();
-        builder.Property(x => x.GraduationYear).IsRequired();
-
-        builder.Property(x => x.AverageScore)
-            .HasColumnType("numeric(5,2)") 
-            .IsRequired();
+        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.IssueDate).IsRequired();
 
         builder.HasOne<EducationDocumentType>()
             .WithMany()

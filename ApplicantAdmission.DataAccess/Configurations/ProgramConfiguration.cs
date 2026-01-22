@@ -21,5 +21,14 @@ public class ProgramConfiguration : IEntityTypeConfiguration<ProgramEntity>
             .WithMany(l => l.Programs)
             .HasForeignKey(x => x.LevelId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(x => x.Code).IsRequired();
+        builder.Property(x => x.Language).IsRequired();
+        builder.Property(x => x.StudyForm).IsRequired();
+
+        builder.HasIndex(x => x.Code);
+        builder.HasIndex(x => x.Language);
+        builder.HasIndex(x => x.StudyForm);
+
     }
 }

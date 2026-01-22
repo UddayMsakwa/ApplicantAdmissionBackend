@@ -10,16 +10,16 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
     {
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.DocumentKind)
-            .IsRequired();
+        builder.Property(x => x.DocumentKind).IsRequired();
 
         builder.HasOne(x => x.Applicant)
             .WithMany(x => x.Documents)
             .HasForeignKey(x => x.ApplicantId);
 
-        builder.HasOne(x => x.File)
-            .WithMany(x => x.Documents)
-            .HasForeignKey(x => x.FileId);
+        builder.HasMany(x => x.Scans)
+            .WithOne(x => x.Document)
+            .HasForeignKey(x => x.DocumentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("Documents");
     }

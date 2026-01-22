@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/applicants")]
+[Route("applicants")]
 public class ApplicantController : ControllerBase
 {
     private readonly IApplicantService _service;

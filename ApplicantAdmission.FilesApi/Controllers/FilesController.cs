@@ -1,12 +1,12 @@
-﻿using ApplicantAdmission.FilesApi.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ApplicantAdmission.FilesApi.Services;
 
 namespace ApplicantAdmission.FilesApi.Controllers;
 
 [ApiController]
-[Route("api/files")]
-[Authorize] 
+[Route("files")]
+[Authorize]
 public class FilesController : ControllerBase
 {
     private readonly IFileStorage _storage;
@@ -16,21 +16,20 @@ public class FilesController : ControllerBase
         _storage = storage;
     }
 
-    
     [HttpPost("upload")]
-    [Authorize(Roles = "Applicant")]
+    [Consumes("multipart/form-data")]
     [RequestSizeLimit(20_000_000)]
-    public async Task<IActionResult> Upload(IFormFile file, CancellationToken ct)
+    public async Task<IActionResult> Upload([FromForm(Name = "file")] IFormFile file, CancellationToken ct)
     {
-        if (file == null || file.Length == 0) return BadRequest("File is required.");
+        if (file == null || file.Length == 0)
+            return BadRequest("File is required.");
 
-        var stored = await _storage.SaveAsync(file, ct);
-        return Ok(new { fileId = stored.FileId, fileName = stored.FileName });
+        var (fileId, fileName) = await _storage.SaveAsync(file, ct);
+        return Ok(new { fileId, fileName });
     }
 
-    
+
     [HttpGet("{fileId:guid}")]
-    [Authorize(Roles = "Manager,HeadManager,Admin")]
     public async Task<IActionResult> Download(Guid fileId, CancellationToken ct)
     {
         var result = await _storage.GetAsync(fileId, ct);
@@ -39,5 +38,3 @@ public class FilesController : ControllerBase
         return File(result.Content, result.ContentType, result.FileName);
     }
 }
-
-

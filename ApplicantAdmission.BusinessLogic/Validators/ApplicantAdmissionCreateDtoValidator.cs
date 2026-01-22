@@ -6,10 +6,6 @@ public class ApplicantAdmissionCreateDtoValidator
 {
     public ApplicantAdmissionCreateDtoValidator()
     {
-        RuleFor(x => x.ApplicantId)
-            .NotEmpty()
-            .WithMessage("ApplicantId is required.");
-
         RuleFor(x => x.AdmissionProgramId)
             .NotEmpty()
             .WithMessage("AdmissionProgramId is required.");

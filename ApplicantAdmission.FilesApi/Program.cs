@@ -1,6 +1,8 @@
 using System.Text;
 using ApplicantAdmission.DataAccess;
 using ApplicantAdmission.FilesApi.Services;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,8 +25,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 
+var cs = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicantDbContext>("db");
+    .AddNpgSql(cs, name: "postgres");
+
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -68,6 +73,11 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -79,7 +89,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();

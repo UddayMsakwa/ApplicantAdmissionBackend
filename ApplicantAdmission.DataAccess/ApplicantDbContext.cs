@@ -25,6 +25,8 @@ public class ApplicantDbContext : DbContext
     public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
     public DbSet<EducationDocumentTypeNextLevel> EducationDocumentTypeNextLevels => Set<EducationDocumentTypeNextLevel>();
+    public DbSet<DocumentScan> DocumentScans => Set<DocumentScan>();
+    
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

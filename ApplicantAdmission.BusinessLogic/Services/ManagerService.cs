@@ -26,12 +26,9 @@ public class ManagerService : IManagerService
     private static bool TryParseStatus(string input, out AdmissionStatus status)
     {
         status = default;
-
         var normalized = input.Trim().Replace(" ", "");
-        
         return Enum.TryParse(normalized, ignoreCase: true, out status);
     }
-
 
     public async Task<List<ManagerDto>> GetAllAsync()
     {
@@ -43,20 +40,17 @@ public class ManagerService : IManagerService
         return _mapper.Map<List<ManagerDto>>(staff);
     }
 
-
     public async Task<PagedResult<ApplicantAdmissionDto>> GetApplicationsAsync(
         string? status, int page, int pageSize)
     {
         page = page < 1 ? 1 : page;
         pageSize = pageSize < 1 ? 10 : pageSize;
 
-        
-        var query = _context.ApplicantAdmissions
-            .Include(x => x.Applicant)
+        IQueryable<ApplicantAdmissionEntity> query = _context.ApplicantAdmissions
+            .Include(x => x.Applicant).ThenInclude(a => a.User)
             .Include(x => x.ManagerUser)
-            .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
-            .AsQueryable();
-
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Faculty)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Level);
 
         if (!string.IsNullOrWhiteSpace(status))
         {
@@ -68,7 +62,6 @@ public class ManagerService : IManagerService
                 throw new BusinessRuleException("Invalid status filter.");
         }
 
-
         var totalCount = await query.CountAsync();
 
         var items = await query
@@ -77,7 +70,6 @@ public class ManagerService : IManagerService
             .Take(pageSize)
             .ToListAsync();
 
-        
         return new PagedResult<ApplicantAdmissionDto>
         {
             Page = page,
@@ -88,9 +80,102 @@ public class ManagerService : IManagerService
     }
 
     
+    public async Task<PagedResult<ApplicantAdmissionDto>> GetApplicationsAdvancedAsync(
+        Guid currentManagerUserId,
+        string? search,
+        Guid? programId,
+        string? facultyIds,
+        string? status,
+        bool? unassignedOnly,
+        bool? assignedToMe,
+        string? sort,
+        string? order,
+        int page,
+        int pageSize)
+    {
+        page = page < 1 ? 1 : page;
+        pageSize = pageSize < 1 ? 10 : pageSize;
+
+        IQueryable<ApplicantAdmissionEntity> query = _context.ApplicantAdmissions
+            .Include(x => x.Applicant).ThenInclude(a => a.User)
+            .Include(x => x.ManagerUser)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Faculty)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Level);
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            if (TryParseStatus(status, out var parsed))
+                query = query.Where(x => x.Status == parsed);
+            else if (int.TryParse(status, out var num) && Enum.IsDefined(typeof(AdmissionStatus), num))
+                query = query.Where(x => (int)x.Status == num);
+            else
+                throw new BusinessRuleException("Invalid status filter.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(x =>
+                x.Applicant.User.FullName.ToLower().Contains(s) ||
+                x.Applicant.User.Email.ToLower().Contains(s));
+        }
+
+        if (programId.HasValue)
+        {
+            var pid = programId.Value;
+            query = query.Where(x => x.AdmissionPrograms.Any(ap => ap.ProgramId == pid));
+        }
+
+        if (!string.IsNullOrWhiteSpace(facultyIds))
+        {
+            var ids = facultyIds
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(x => Guid.TryParse(x, out var g) ? g : Guid.Empty)
+                .Where(g => g != Guid.Empty)
+                .ToList();
+
+            if (ids.Count > 0)
+                query = query.Where(x =>
+                    x.AdmissionPrograms.Any(ap => ids.Contains(ap.Program.FacultyId)));
+        }
+
+        if (unassignedOnly == true)
+            query = query.Where(x => x.ManagerUserId == null);
+
+        if (assignedToMe == true)
+            query = query.Where(x => x.ManagerUserId == currentManagerUserId);
+
+        var sortKey = (sort ?? "lastModified").Trim().ToLower();
+        var desc = (order ?? "desc").Trim().ToLower() != "asc";
+
+        query = sortKey switch
+        {
+            "created" =>
+                desc ? query.OrderByDescending(x => x.CreatedAt) : query.OrderBy(x => x.CreatedAt),
+            "lastmodified" or _ =>
+                desc ? query.OrderByDescending(x => x.LastModifiedAt) : query.OrderBy(x => x.LastModifiedAt)
+        };
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<ApplicantAdmissionDto>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            Items = _mapper.Map<List<ApplicantAdmissionDto>>(items)
+        };
+    }
+
     public async Task<ApplicantDto> GetApplicantAsync(Guid applicantId)
     {
         var applicant = await _context.Applicants
+            .Include(a => a.User)
             .FirstOrDefaultAsync(x => x.Id == applicantId);
 
         if (applicant == null)
@@ -99,20 +184,21 @@ public class ManagerService : IManagerService
         return _mapper.Map<ApplicantDto>(applicant);
     }
 
-
     public async Task<ApplicantAdmissionDto> TakeAdmissionAsync(Guid admissionId, Guid managerUserId)
     {
         var admission = await _context.ApplicantAdmissions
-            .Include(x => x.Applicant)
+            .Include(x => x.Applicant).ThenInclude(a => a.User)
             .Include(x => x.ManagerUser)
-            .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Faculty)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Level)
             .FirstOrDefaultAsync(x => x.Id == admissionId);
 
         if (admission == null)
             throw new NotFoundException("Admission not found.");
 
         var staffExists = await _context.Users.AnyAsync(u =>
-            u.Id == managerUserId && (u.Role == UserRole.Manager || u.Role == UserRole.HeadManager || u.Role == UserRole.Admin));
+            u.Id == managerUserId &&
+            (u.Role == UserRole.Manager || u.Role == UserRole.HeadManager || u.Role == UserRole.Admin));
 
         if (!staffExists)
             throw new NotFoundException("Manager not found.");
@@ -133,14 +219,13 @@ public class ManagerService : IManagerService
         return _mapper.Map<ApplicantAdmissionDto>(admission);
     }
 
-
-
     public async Task<ApplicantAdmissionDto> ReleaseAdmissionAsync(Guid admissionId, Guid managerUserId)
     {
         var admission = await _context.ApplicantAdmissions
-            .Include(x => x.Applicant)
+            .Include(x => x.Applicant).ThenInclude(a => a.User)
             .Include(x => x.ManagerUser)
-            .Include(x => x.AdmissionProgram).ThenInclude(x => x.Program)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Faculty)
+            .Include(x => x.AdmissionPrograms).ThenInclude(ap => ap.Program).ThenInclude(p => p.Level)
             .FirstOrDefaultAsync(x => x.Id == admissionId);
 
         if (admission == null)
@@ -158,8 +243,6 @@ public class ManagerService : IManagerService
 
         return _mapper.Map<ApplicantAdmissionDto>(admission);
     }
-
-
 
     public async Task<ApplicantDto> UpdateApplicantAsync(Guid applicantId, ApplicantUpdateDto dto)
     {
@@ -183,5 +266,4 @@ public class ManagerService : IManagerService
 
         return _mapper.Map<ApplicantDto>(applicant);
     }
-
 }

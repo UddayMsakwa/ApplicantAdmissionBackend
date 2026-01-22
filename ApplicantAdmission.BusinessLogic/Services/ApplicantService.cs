@@ -1,6 +1,7 @@
 ﻿using ApplicantAdmission.BusinessLogic.Exceptions;
 using ApplicantAdmission.BusinessLogic.Interfaces;
 using ApplicantAdmission.BusinessLogic.Models.Dtos.Applicant;
+using ApplicantAdmission.DataAccess.Enums;
 using ApplicantAdmission.DataAccess;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ public class ApplicantService : IApplicantService
         return _mapper.Map<ApplicantDto>(applicant);
     }
 
+
     public async Task<ApplicantDto> UpdateMeAsync(Guid userId, ApplicantUpdateDto dto)
     {
         var applicant = await _context.Applicants
@@ -54,11 +56,21 @@ public class ApplicantService : IApplicantService
 
         if (applicant == null) throw new NotFoundException("Applicant profile not found.");
 
-        
+
+        var latestAdmission = await _context.ApplicantAdmissions
+            .Where(a => a.ApplicantId == applicant.Id)
+            .OrderByDescending(a => a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (latestAdmission?.Status == AdmissionStatus.Closed)
+            throw new BusinessRuleException("Admission is Closed. Editing is запрещено.");
+
         if (!string.IsNullOrWhiteSpace(dto.FullName))
             applicant.User.FullName = dto.FullName;
 
-        
+        if (!string.IsNullOrWhiteSpace(dto.Email))
+            applicant.User.Email = dto.Email;
+
         if (!string.IsNullOrWhiteSpace(dto.Phone))
             applicant.Phone = dto.Phone;
 
@@ -70,6 +82,9 @@ public class ApplicantService : IApplicantService
 
         if (dto.Citizenship != null)
             applicant.Citizenship = dto.Citizenship;
+
+        if (latestAdmission != null)
+            latestAdmission.LastModifiedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return _mapper.Map<ApplicantDto>(applicant);

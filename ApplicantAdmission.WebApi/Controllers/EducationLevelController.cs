@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApplicantAdmission.WebApi.Controllers;
 
 [ApiController]
-[Route("api/education-levels")]
+[Route("education-levels")]
 public class EducationLevelController : ControllerBase
 {
     private readonly IEducationLevelService _service;

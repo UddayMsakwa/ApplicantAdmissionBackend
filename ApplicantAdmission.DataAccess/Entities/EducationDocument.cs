@@ -10,9 +10,7 @@ public class EducationDocument : Document
     }
 
     public Guid DocumentTypeId { get; set; }
-    public string InstitutionName { get; set; } = null!;
-    public int GraduationYear { get; set; }
-    public decimal AverageScore { get; set; }
+
+    public string Name { get; set; } = "";
+    public DateTime IssueDate { get; set; }
 }
-
-
